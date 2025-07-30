@@ -94,6 +94,7 @@ export const Input = styled.input`
   border-radius: 8px;
   font-family: "Inter", sans-serif;
   font-size: 16px;
+  box-sizing: border-box;
 `;
 
 export const Button = styled.button`

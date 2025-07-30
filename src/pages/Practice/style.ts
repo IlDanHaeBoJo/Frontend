@@ -5,14 +5,14 @@ export const Container = styled.div`
   justify-content: center;
   align-items: center;
   gap: 40px;
-  padding: 50px;
+  padding: 100px 50px;
   background-color: #ffffff;
 `;
 
 export const OptionBox = styled.div`
   width: 460px;
   height: 400px;
-  padding: 40px;
+  padding: 20px;
   background-color: #f2f7ff;
   border: 1px solid #ccd9ff;
   border-radius: 8px;
@@ -37,7 +37,7 @@ export const Description = styled.p`
   margin-bottom: 30px;
 `;
 
-export const Dropdown = styled.div`
+export const Dropdown = styled.div<{ isHidden?: boolean }>`
   width: 380px;
   height: 50px;
   padding: 0 20px;
@@ -48,7 +48,9 @@ export const Dropdown = styled.div`
   justify-content: space-between;
   align-items: center;
   margin-bottom: 30px;
+  box-sizing: border-box;
   cursor: pointer;
+  visibility: ${({ isHidden }) => (isHidden ? "hidden" : "visible")};
 
   span {
     font-family: "Inter", sans-serif;

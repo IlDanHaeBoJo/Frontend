@@ -26,7 +26,7 @@ const Header: React.FC<HeaderProps> = ({ userRole }) => {
     setIsDropdownOpen(false);
   };
 
-  const isAdmin = userRole === "admin";
+  const isAdmin = userRole === "student";
 
   return (
     <S.HeaderContainer>

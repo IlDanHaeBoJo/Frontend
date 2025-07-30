@@ -31,7 +31,7 @@ const Practice = () => {
           <br />
           실제 상황과 유사한 실습을 진행합니다.
         </S.Description>
-        <S.Dropdown>
+        <S.Dropdown isHidden={true}>
           <span>분야를 선택하세요</span>
           <span>▼</span>
         </S.Dropdown>
