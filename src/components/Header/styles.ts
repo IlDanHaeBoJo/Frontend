@@ -15,6 +15,19 @@ export const Logo = styled.div`
   font-weight: 700;
   font-size: 24px;
   color: #3366cc;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+`;
+
+export const AdminBadge = styled.span`
+  background-color: #cc3333;
+  color: #ffffff;
+  padding: 5px 10px;
+  border-radius: 15px;
+  font-size: 14px;
+  font-weight: 700;
 `;
 
 export const Menu = styled.nav`
@@ -22,20 +35,46 @@ export const Menu = styled.nav`
   gap: 10px;
 `;
 
-export const MenuButton = styled.button<{ isActive: boolean }>`
+export const MenuButton = styled.button<{
+  isActive: boolean;
+  isAdmin?: boolean;
+}>`
   padding: 10px 20px;
   font-family: "Inter", sans-serif;
   font-weight: ${({ isActive }) => (isActive ? "700" : "500")};
   font-size: 16px;
-  color: ${({ isActive }) => (isActive ? "#ffffff" : "#8080b2")};
-  background-color: ${({ isActive }) => (isActive ? "#3366cc" : "#fafaff")};
-  border: 1px solid ${({ isActive }) => (isActive ? "#3366cc" : "#e5ebfa")};
+  color: ${({ isActive, isAdmin }) =>
+    isActive ? "#ffffff" : isAdmin ? "#808080" : "#8080b2"};
+  background-color: ${({ isActive, isAdmin }) =>
+    isActive
+      ? isAdmin
+        ? "#cc3333"
+        : "#3366cc"
+      : isAdmin
+      ? "#f2f2f2"
+      : "#fafaff"};
+  border: 1px solid
+    ${({ isActive, isAdmin }) =>
+      isActive
+        ? isAdmin
+          ? "#cc3333"
+          : "#3366cc"
+        : isAdmin
+        ? "#e6e6e6"
+        : "#e5ebfa"};
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s ease-in-out;
 
   &:hover {
-    background-color: ${({ isActive }) => (isActive ? "#254e99" : "#e5ebfa")};
+    background-color: ${({ isActive, isAdmin }) =>
+      isActive
+        ? isAdmin
+          ? "#a32929"
+          : "#254e99"
+        : isAdmin
+        ? "#e6e6e6"
+        : "#e5ebfa"};
   }
 `;
 
@@ -51,12 +90,12 @@ export const UserProfile = styled.div`
   cursor: pointer;
 `;
 
-export const Avatar = styled.div`
+export const Avatar = styled.div<{ isAdmin?: boolean }>`
   width: 28px;
   height: 28px;
   line-height: 28px;
   text-align: center;
-  background-color: #3366cc;
+  background-color: ${({ isAdmin }) => (isAdmin ? "#cc3333" : "#3366cc")};
   color: #ffffff;
   border-radius: 14px;
   font-size: 16px;
