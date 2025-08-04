@@ -8,7 +8,7 @@ In the project directory, you can run:
 
 ### `yarn start`
 
-실행하기
+실행하기\
 Runs the app in the development mode.\
 Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
@@ -17,13 +17,13 @@ You will also see any lint errors in the console.
 
 ### `yarn test`
 
-테스트용 인터랙티브 모드
+테스트용 인터랙티브 모드\
 Launches the test runner in the interactive watch mode.\
 See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
 ### `yarn build`
 
-배포용 정적 파일을 생성
+배포용 정적 파일을 생성\
 Builds the app for production to the `build` folder.\
 It correctly bundles React in production mode and optimizes the build for the best performance.
 
@@ -34,5 +34,6 @@ See the section about [deployment](https://facebook.github.io/create-react-app/d
 
 ## 학생 화면, 관리자 화면 전환하기
 
-\src\components\Header\index.tsx 29번째 줄
-`const isAdmin = userRole === "student"; //or "admin"`
+\src\components\Header\index.tsx 29번째 줄\
+학생 : `const isAdmin = userRole === "student";`\
+관리자(교수) : `const isAdmin = userRole === "admin";`
