@@ -5,12 +5,15 @@ export const Container = styled.div`
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background-color: #ffffff;
+  background-color: #f0f2f5;
 `;
 
 export const LoginBox = styled.div`
   width: 500px;
   padding: 40px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -34,6 +37,7 @@ export const Input = styled.input`
   margin-bottom: 20px;
   font-family: "Inter", sans-serif;
   font-size: 16px;
+  box-sizing: border-box;
 
   &::placeholder {
     color: #808080;

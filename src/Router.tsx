@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
 import Layout from "./components/Layout";
 import Login from "./pages/Login";
 import Practice from "./pages/Practice";
@@ -16,6 +16,15 @@ const Router = () => {
     <BrowserRouter>
       <Routes>
         <Route element={<Layout />}>
+          <Route
+            path="/"
+            element={
+              <div style={{ textAlign: "center", marginTop: "50px" }}>
+                <h1>여긴 뭐하징</h1>
+                <Link to="/login">로그인 페이지로 이동</Link>
+              </div>
+            }
+          />
           <Route path="/login" element={<Login />} />
           <Route path="/practice" element={<Practice />} />
           <Route path="/practice-progress" element={<PracticeProgress />} />
@@ -24,7 +33,7 @@ const Router = () => {
           <Route path="/notice" element={<Notice />} />
           <Route path="/mypage" element={<MyPage />} />
           <Route path="/evaluation" element={<Evaluation />} />
-          <Route path="notice-manage" element={<NoticeManage />} />
+          <Route path="/notice-manage" element={<NoticeManage />} />
         </Route>
       </Routes>
     </BrowserRouter>
