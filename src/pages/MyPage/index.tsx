@@ -1,14 +1,25 @@
 import React from "react";
 import * as S from "./style";
+import { useUser } from "../../store/UserContext";
 
 const MyPage = () => {
+  const { user } = useUser();
+
+  if (!user) {
+    return (
+      <S.Container>
+        <p>사용자 정보를 불러오는 중입니다...</p>
+      </S.Container>
+    );
+  }
+
   return (
     <S.Container>
       <S.ProfileSection>
         <S.ProfileImage />
         <div>
-          <S.UserName>홍길동</S.UserName>
-          <S.UserEmail>hong@university.ac.kr</S.UserEmail>
+          <S.UserName>{user.name}</S.UserName>
+          <S.UserEmail>{user.email}</S.UserEmail>
         </div>
       </S.ProfileSection>
       <S.InfoSection>
@@ -16,19 +27,23 @@ const MyPage = () => {
           <S.CardTitle>기본 정보</S.CardTitle>
           <S.InfoItem>
             <S.InfoLabel>이름</S.InfoLabel>
-            <S.InfoValue>홍길동</S.InfoValue>
+            <S.InfoValue>{user.name}</S.InfoValue>
           </S.InfoItem>
-          <S.InfoItem>
-            <S.InfoLabel>학번</S.InfoLabel>
-            <S.InfoValue>2024001234</S.InfoValue>
-          </S.InfoItem>
+          {user.role === "student" && (
+            <>
+              <S.InfoItem>
+                <S.InfoLabel>학번</S.InfoLabel>
+                <S.InfoValue>{user.student_id || "N/A"}</S.InfoValue>
+              </S.InfoItem>
+              <S.InfoItem>
+                <S.InfoLabel>전공</S.InfoLabel>
+                <S.InfoValue>{user.major || "N/A"}</S.InfoValue>
+              </S.InfoItem>
+            </>
+          )}
           <S.InfoItem>
             <S.InfoLabel>이메일</S.InfoLabel>
-            <S.InfoValue>hong@university.ac.kr</S.InfoValue>
-          </S.InfoItem>
-          <S.InfoItem>
-            <S.InfoLabel>전공</S.InfoLabel>
-            <S.InfoValue>의학과</S.InfoValue>
+            <S.InfoValue>{user.email}</S.InfoValue>
           </S.InfoItem>
         </S.InfoCard>
         <S.InfoCard>

@@ -1,15 +1,19 @@
 import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import * as S from "./styles";
+import { api } from "../../apis";
+import {
+  getRefreshToken,
+  clearAccessToken,
+  clearRefreshToken,
+} from "../../store/tokenManager";
+import { useUser } from "../../store/UserContext";
 
-interface HeaderProps {
-  userRole: "student" | "admin";
-}
-
-const Header: React.FC<HeaderProps> = ({ userRole }) => {
+const Header = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const { user, setUser, setIsAuthenticated, isAuthenticated } = useUser();
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
@@ -20,13 +24,34 @@ const Header: React.FC<HeaderProps> = ({ userRole }) => {
     setIsDropdownOpen(false);
   };
 
-  const handleLogoutClick = () => {
-    // In a real app, you'd handle logout logic here (e.g., clearing tokens)
-    navigate("/login");
-    setIsDropdownOpen(false);
+  const handleLogoutClick = async () => {
+    const refreshToken = getRefreshToken();
+    try {
+      if (refreshToken) {
+        await api.post("/auth/logout", { refresh_token: refreshToken });
+      }
+    } catch (error) {
+      console.error("Logout failed:", error);
+    } finally {
+      clearAccessToken();
+      clearRefreshToken();
+      setUser(null);
+      setIsAuthenticated(false);
+      alert("로그아웃 되었습니다.");
+      navigate("/login");
+      setIsDropdownOpen(false);
+    }
   };
 
-  const isAdmin = userRole === "student";
+  if (!isAuthenticated || !user) {
+    return (
+      <S.HeaderContainer>
+        <S.Logo onClick={() => navigate("/login")}>🏥 MediCPX</S.Logo>
+      </S.HeaderContainer>
+    );
+  }
+
+  const isAdmin = user.role === "admin";
 
   return (
     <S.HeaderContainer>
@@ -76,7 +101,7 @@ const Header: React.FC<HeaderProps> = ({ userRole }) => {
       </S.Menu>
       <S.UserProfile onClick={toggleDropdown}>
         <S.Avatar isAdmin={isAdmin}>{isAdmin ? "👨‍🏫" : "👤"}</S.Avatar>
-        <S.Username>{isAdmin ? "김교수" : "홍길동"}</S.Username>
+        <S.Username>{user.name}</S.Username>
         <S.DropdownIcon>▼</S.DropdownIcon>
         {isDropdownOpen && (
           <S.DropdownMenu>

@@ -57,8 +57,17 @@ export const LoginButton = styled.button`
   cursor: pointer;
 
   &:hover {
-    background-color: #254e99;
+    text-decoration: underline;
   }
+`;
+
+export const ErrorMsg = styled.p`
+  color: red;
+  font-size: 12px;
+  margin-top: -15px;
+  margin-bottom: 10px;
+  align-self: flex-start;
+  margin-left: 65px;
 `;
 
 export const RegisterText = styled.p`
