@@ -31,9 +31,3 @@ The build is minified and the filenames include the hashes.\
 Your app is ready to be deployed!
 
 See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-## 학생 화면, 관리자 화면 전환하기
-
-\src\components\Header\index.tsx 29번째 줄\
-학생 : `const isAdmin = userRole === "student";`\
-관리자(교수) : `const isAdmin = userRole === "admin";`
