@@ -1,8 +1,7 @@
 import axios from "axios";
 import { getAccessToken } from "../store/tokenManager";
 
-// const baseURL = process.env.REACT_APP_API_URL;
-const baseURL = "http://localhost:8001";
+const baseURL = process.env.REACT_APP_API_URL;
 
 // Instance for public requests (e.g., login, signup)
 export const publicApi = axios.create({
