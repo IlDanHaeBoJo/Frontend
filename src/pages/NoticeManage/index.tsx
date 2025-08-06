@@ -2,24 +2,14 @@ import React, { useState, useEffect } from "react";
 import * as S from "./style";
 import { createNotice, getNotices } from "../../apis/notice";
 import { useUser } from "../../store/UserContext";
-
-interface Notice {
-  title: string;
-  content: string;
-  important: boolean;
-  author_id: number;
-  notice_id: number;
-  view_count: number;
-  created_at: string;
-  updated_at: string;
-}
+import { GetNotice } from "../../types/notice";
 
 const NoticeManage = () => {
   const { user } = useUser();
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [important, setImportant] = useState(false);
-  const [notices, setNotices] = useState<Notice[]>([]);
+  const [notices, setNotices] = useState<GetNotice[]>([]);
 
   const fetchNotices = async () => {
     try {

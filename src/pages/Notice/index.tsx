@@ -1,52 +1,69 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import * as S from "./style";
+import { getStudentNotices } from "../../apis/notice";
+import type { GetNotice } from "../../types/notice";
 
-const notices = [
+const dummyNotices: GetNotice[] = [
   {
-    id: 1,
-    title: "[필수] 2024년 1학기 CPX 실습 일정 변경 안내ㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁ",
-    date: "2024.01.15",
+    notice_id: 1,
+    title: "[중요] 더미 데이터 1입니다.",
     content:
-      "코로나19 상황으로 인해 기존 대면 실습에서 온라인 실습으로 변경됩니다. 자세한 내용은 본문을 확인해주세요.\n\n온라인 실습은 Zoom을 통해 진행되며, 실습 링크는 추후 공지될 예정입니다.\n\n실습 관련 문의는 cpx@medicpx.com으로 연락주시기 바랍니다.",
-    file: "2024년 1학기 CPX 실습 일정 변경 안내.pdf",
+      "이것은 첫 번째 더미 데이터입니다. API 호출에 실패했거나 공지사항이 없습니다.",
     important: true,
+    author_id: 0,
+    view_count: 0,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
   },
   {
-    id: 2,
-    title: "CPX 평가 기준 업데이트 안내",
-    date: "2024.01.10",
-    content:
-      "CPX 평가 기준이 업데이트되었습니다. 자세한 내용은 본문을 확인해주세요.",
-    file: null,
+    notice_id: 2,
+    title: "더미 데이터 2입니다.",
+    content: "이것은 두 번째 더미 데이터입니다.",
     important: false,
-  },
-  {
-    id: 3,
-    title: "시스템 점검 안내 (1월 20일 02:00~04:00)",
-    date: "2024.01.08",
-    content: "시스템 점검이 있을 예정입니다. 이용에 참고 부탁드립니다.",
-    file: null,
-    important: false,
-  },
-  {
-    id: 4,
-    title: "신규 업데이트: 음성 인식 기능 개선",
-    date: "2024.01.05",
-    content: "음성 인식 기능이 개선되었습니다. 많은 이용 바랍니다.",
-    file: null,
-    important: false,
+    author_id: 0,
+    view_count: 0,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
   },
 ];
 
 const Notice = () => {
-  const [selectedNotice, setSelectedNotice] = useState(notices[0]);
+  const [notices, setNotices] = useState<GetNotice[]>([]);
+  const [selectedNotice, setSelectedNotice] = useState<GetNotice | null>(null);
+
+  useEffect(() => {
+    const fetchNotices = async () => {
+      try {
+        const data = await getStudentNotices();
+        if (data && data.length > 0) {
+          setNotices(data);
+          setSelectedNotice(data[0]);
+        } else {
+          setNotices(dummyNotices);
+          setSelectedNotice(dummyNotices[0]);
+        }
+      } catch (error) {
+        console.error("Failed to fetch notices:", error);
+        setNotices(dummyNotices);
+        setSelectedNotice(dummyNotices[0]);
+      }
+    };
+
+    fetchNotices();
+  }, []);
+
+  if (!selectedNotice) {
+    return <div>공지사항을 불러오는 중입니다...</div>;
+  }
 
   return (
     <S.Wrapper>
       <S.Container>
         <S.NoticeDetails>
           <S.Title>{selectedNotice.title}</S.Title>
-          <S.Date>{selectedNotice.date}</S.Date>
+          <S.Date>
+            {new Date(selectedNotice.created_at).toLocaleDateString()}
+          </S.Date>
           <S.Divider />
           <S.Content>
             {selectedNotice.content.split("\n").map((line, index) => (
@@ -56,7 +73,7 @@ const Notice = () => {
               </React.Fragment>
             ))}
           </S.Content>
-          {selectedNotice.file && (
+          {/* {selectedNotice.file && (
             <S.Attachments>
               <S.AttachmentsTitle>첨부파일</S.AttachmentsTitle>
               <S.AttachmentFile>
@@ -64,20 +81,22 @@ const Notice = () => {
                 <S.FileName>{selectedNotice.file}</S.FileName>
               </S.AttachmentFile>
             </S.Attachments>
-          )}
+          )} */}
         </S.NoticeDetails>
         <S.NoticeList>
           {notices.map((notice) => (
             <S.NoticeItem
-              key={notice.id}
-              active={selectedNotice.id === notice.id}
+              key={notice.notice_id}
+              active={selectedNotice.notice_id === notice.notice_id}
               onClick={() => setSelectedNotice(notice)}
             >
               <S.NoticeItemTitleWrapper>
                 {notice.important && <S.Badge>중요</S.Badge>}
                 <S.NoticeItemTitle>{notice.title}</S.NoticeItemTitle>
               </S.NoticeItemTitleWrapper>
-              <S.NoticeItemDate>{notice.date}</S.NoticeItemDate>
+              <S.NoticeItemDate>
+                {new Date(notice.created_at).toLocaleDateString()}
+              </S.NoticeItemDate>
             </S.NoticeItem>
           ))}
         </S.NoticeList>

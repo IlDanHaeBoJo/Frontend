@@ -14,3 +14,8 @@ export const createNotice = async (data: {
   const response = await api.post("/admin/notices/", data);
   return response.data;
 };
+
+export const getStudentNotices = async () => {
+  const response = await api.get("/student/notices/");
+  return response.data;
+};
