@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import { colors } from "../../styles/colors";
 
 export const HeaderContainer = styled.header`
   display: flex;
@@ -6,15 +7,15 @@ export const HeaderContainer = styled.header`
   align-items: center;
   padding: 0 20px;
   height: 90px;
-  background-color: #ffffff;
-  border-bottom: 1px solid #d9e5ff;
+  background-color: ${colors.white};
+  border-bottom: 1px solid ${colors.cloudBlue3};
 `;
 
 export const Logo = styled.div`
   font-family: "Inter", sans-serif;
   font-weight: 700;
   font-size: 24px;
-  color: #3366cc;
+  color: ${colors.blue};
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -22,8 +23,8 @@ export const Logo = styled.div`
 `;
 
 export const AdminBadge = styled.span`
-  background-color: #cc3333;
-  color: #ffffff;
+  background-color: ${colors.darkRed};
+  color: ${colors.white};
   padding: 5px 10px;
   border-radius: 15px;
   font-size: 14px;
@@ -44,24 +45,24 @@ export const MenuButton = styled.button<{
   font-weight: ${({ isActive }) => (isActive ? "700" : "500")};
   font-size: 16px;
   color: ${({ isActive, isAdmin }) =>
-    isActive ? "#ffffff" : isAdmin ? "#808080" : "#8080b2"};
+    isActive ? colors.white : isAdmin ? colors.gray500 : "#8080b2"};
   background-color: ${({ isActive, isAdmin }) =>
     isActive
       ? isAdmin
-        ? "#cc3333"
-        : "#3366cc"
+        ? colors.darkRed
+        : colors.blue
       : isAdmin
-      ? "#f2f2f2"
-      : "#fafaff"};
+      ? colors.gray100
+      : colors.whiteBlue};
   border: 1px solid
     ${({ isActive, isAdmin }) =>
       isActive
         ? isAdmin
-          ? "#cc3333"
-          : "#3366cc"
+          ? colors.darkRed
+          : colors.blue
         : isAdmin
-        ? "#e6e6e6"
-        : "#e5ebfa"};
+        ? colors.gray200
+        : colors.lavenderBlue2};
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s ease-in-out;
@@ -71,10 +72,10 @@ export const MenuButton = styled.button<{
       isActive
         ? isAdmin
           ? "#a32929"
-          : "#254e99"
+          : colors.darkBlue
         : isAdmin
-        ? "#e6e6e6"
-        : "#e5ebfa"};
+        ? colors.gray200
+        : colors.lavenderBlue2};
   }
 `;
 
@@ -84,8 +85,8 @@ export const UserProfile = styled.div`
   align-items: center;
   gap: 10px;
   padding: 5px 15px;
-  background-color: #fafcff;
-  border: 1px solid #e5ebfa;
+  background-color: ${colors.whiteBlue};
+  border: 1px solid ${colors.lavenderBlue2};
   border-radius: 20px;
   cursor: pointer;
 `;
@@ -95,8 +96,9 @@ export const Avatar = styled.div<{ isAdmin?: boolean }>`
   height: 28px;
   line-height: 28px;
   text-align: center;
-  background-color: ${({ isAdmin }) => (isAdmin ? "#cc3333" : "#3366cc")};
-  color: #ffffff;
+  background-color: ${({ isAdmin }) =>
+    isAdmin ? colors.darkRed : colors.blue};
+  color: ${colors.white};
   border-radius: 14px;
   font-size: 16px;
 `;
@@ -105,12 +107,12 @@ export const Username = styled.span`
   font-family: "Inter", sans-serif;
   font-weight: 500;
   font-size: 15px;
-  color: #33334d;
+  color: ${colors.indigoGray3};
 `;
 
 export const DropdownIcon = styled.span`
   font-size: 12px;
-  color: #9999b2;
+  color: ${colors.indigoGray1};
 `;
 
 export const DropdownMenu = styled.div`
@@ -118,8 +120,8 @@ export const DropdownMenu = styled.div`
   top: 50px;
   right: 0;
   width: 200px;
-  background-color: #ffffff;
-  border: 1px solid #e6e6e6;
+  background-color: ${colors.white};
+  border: 1px solid ${colors.gray200};
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   padding: 10px 0;
@@ -130,16 +132,16 @@ export const DropdownItem = styled.div`
   padding: 10px 20px;
   font-family: "Inter", sans-serif;
   font-size: 16px;
-  color: #1a1a1a;
+  color: ${colors.gray800};
   cursor: pointer;
 
   &:hover {
-    background-color: #f2f2f2;
+    background-color: ${colors.gray100};
   }
 `;
 
 export const DropdownDivider = styled.div`
   height: 1px;
-  background-color: #e6e6e6;
+  background-color: ${colors.gray200};
   margin: 5px 0;
 `;
