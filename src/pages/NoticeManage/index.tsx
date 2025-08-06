@@ -1,7 +1,37 @@
-import React from "react";
+import React, { useState } from "react";
 import * as S from "./style";
+import { createNotice } from "../../apis/notice";
+import { useUser } from "../../store/UserContext";
 
 const NoticeManage = () => {
+  const { user } = useUser();
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+  const [important, setImportant] = useState(false);
+
+  const handlePublish = async () => {
+    if (!user) {
+      alert("로그인이 필요합니다.");
+      return;
+    }
+    try {
+      await createNotice({
+        title,
+        content,
+        important,
+        author_id: user.id,
+      });
+      alert("공지사항이 성공적으로 게시되었습니다.");
+      // Optionally, refresh the list of notices or clear the form
+      setTitle("");
+      setContent("");
+      setImportant(false);
+    } catch (error) {
+      console.error("Failed to publish notice:", error);
+      alert("공지사항 게시에 실패했습니다.");
+    }
+  };
+
   const notices = [
     {
       id: 1,
@@ -35,18 +65,29 @@ const NoticeManage = () => {
         <S.FormTitle>✍️ 새 공지사항 작성</S.FormTitle>
         <S.InputGroup>
           <S.Label>제목 *</S.Label>
-          <S.Input placeholder="공지사항 제목을 입력하세요..." />
+          <S.Input
+            placeholder="공지사항 제목을 입력하세요..."
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+          />
         </S.InputGroup>
         <S.InputGroup>
           <S.Label>중요도</S.Label>
-          <S.Select>
+          <S.Select
+            value={important ? "중요" : "일반"}
+            onChange={(e) => setImportant(e.target.value === "중요")}
+          >
             <option>일반</option>
             <option>중요</option>
           </S.Select>
         </S.InputGroup>
         <S.InputGroup>
           <S.Label>내용 *</S.Label>
-          <S.Textarea placeholder="공지사항 내용을 입력하세요..." />
+          <S.Textarea
+            placeholder="공지사항 내용을 입력하세요..."
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+          />
         </S.InputGroup>
         <S.InputGroup>
           <S.Label>첨부파일</S.Label>
@@ -56,8 +97,8 @@ const NoticeManage = () => {
           </S.FileInput>
         </S.InputGroup>
         <S.ButtonSection>
-          <S.DraftButton>💾 임시저장</S.DraftButton>
-          <S.PublishButton>🚀 게시하기</S.PublishButton>
+          {/* <S.DraftButton>💾 임시저장</S.DraftButton> */}
+          <S.PublishButton onClick={handlePublish}>🚀 게시하기</S.PublishButton>
         </S.ButtonSection>
       </S.FormSection>
       <S.ListSection>
