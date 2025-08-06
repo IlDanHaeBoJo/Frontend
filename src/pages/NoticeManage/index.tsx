@@ -1,8 +1,13 @@
 import React, { useState, useEffect } from "react";
 import * as S from "./style";
-import { createNotice, getNotices } from "../../apis/notice";
+import {
+  createNotice,
+  getAdminNotices,
+  updateNotice,
+  deleteNotice,
+} from "../../apis/notice";
 import { useUser } from "../../store/UserContext";
-import { GetNotice } from "../../types/notice";
+import { GetNotice, dummyNotices } from "../../types/notice";
 
 const NoticeManage = () => {
   const { user } = useUser();
@@ -10,13 +15,19 @@ const NoticeManage = () => {
   const [content, setContent] = useState("");
   const [important, setImportant] = useState(false);
   const [notices, setNotices] = useState<GetNotice[]>([]);
+  const [editingNotice, setEditingNotice] = useState<GetNotice | null>(null);
 
   const fetchNotices = async () => {
     try {
-      const data = await getNotices();
-      setNotices(data);
+      const data = await getAdminNotices();
+      if (data && data.length > 0) {
+        setNotices(data);
+      } else {
+        setNotices(dummyNotices);
+      }
     } catch (error) {
       console.error("Failed to fetch notices:", error);
+      setNotices(dummyNotices);
     }
   };
 
@@ -29,28 +40,67 @@ const NoticeManage = () => {
       alert("로그인이 필요합니다.");
       return;
     }
+
+    const noticeData = {
+      title,
+      content,
+      important,
+      author_id: user.id,
+    };
+
     try {
-      await createNotice({
-        title,
-        content,
-        important,
-        author_id: user.id,
-      });
-      alert("공지사항이 성공적으로 게시되었습니다.");
-      setTitle("");
-      setContent("");
-      setImportant(false);
-      fetchNotices(); // Refresh the list after publishing
+      if (editingNotice) {
+        await updateNotice(editingNotice.notice_id, {
+          title,
+          content,
+          important,
+        });
+        alert("공지사항이 성공적으로 수정되었습니다.");
+      } else {
+        await createNotice(noticeData);
+        alert("공지사항이 성공적으로 게시되었습니다.");
+      }
+      resetForm();
+      fetchNotices();
     } catch (error) {
       console.error("Failed to publish notice:", error);
-      alert("공지사항 게시에 실패했습니다.");
+      alert("공지사항 처리에 실패했습니다.");
+    }
+  };
+
+  const handleEditClick = (notice: GetNotice) => {
+    setEditingNotice(notice);
+    setTitle(notice.title);
+    setContent(notice.content);
+    setImportant(notice.important);
+  };
+
+  const resetForm = () => {
+    setEditingNotice(null);
+    setTitle("");
+    setContent("");
+    setImportant(false);
+  };
+
+  const handleDelete = async (id: number) => {
+    if (window.confirm("정말로 이 공지사항을 삭제하시겠습니까?")) {
+      try {
+        await deleteNotice(id);
+        alert("공지사항이 삭제되었습니다.");
+        fetchNotices();
+      } catch (error) {
+        console.error("Failed to delete notice:", error);
+        alert("공지사항 삭제에 실패했습니다.");
+      }
     }
   };
 
   return (
     <S.Container>
       <S.FormSection>
-        <S.FormTitle>✍️ 새 공지사항 작성</S.FormTitle>
+        <S.FormTitle>
+          {editingNotice ? "✍️ 공지사항 수정" : "✍️ 새 공지사항 작성"}
+        </S.FormTitle>
         <S.InputGroup>
           <S.Label>제목 *</S.Label>
           <S.Input
@@ -85,8 +135,12 @@ const NoticeManage = () => {
           </S.FileInput>
         </S.InputGroup>
         <S.ButtonSection>
-          {/* <S.DraftButton>💾 임시저장</S.DraftButton> */}
-          <S.PublishButton onClick={handlePublish}>🚀 게시하기</S.PublishButton>
+          {editingNotice && (
+            <S.CancelButton onClick={resetForm}>취소</S.CancelButton>
+          )}
+          <S.PublishButton onClick={handlePublish}>
+            {editingNotice ? "💾 수정하기" : "🚀 게시하기"}
+          </S.PublishButton>
         </S.ButtonSection>
       </S.FormSection>
       <S.ListSection>
@@ -106,8 +160,12 @@ const NoticeManage = () => {
               <S.StatusBadge>게시중</S.StatusBadge>
             </S.NoticeInfo>
             <S.ActionButtons>
-              <S.EditButton>✏️ 편집</S.EditButton>
-              <S.DeleteButton>🗑️ 삭제</S.DeleteButton>
+              <S.EditButton onClick={() => handleEditClick(notice)}>
+                ✏️ 편집
+              </S.EditButton>
+              <S.DeleteButton onClick={() => handleDelete(notice.notice_id)}>
+                🗑️ 삭제
+              </S.DeleteButton>
             </S.ActionButtons>
           </S.NoticeCard>
         ))}
