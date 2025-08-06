@@ -28,7 +28,7 @@ export const updateNotice = async (
     important: boolean;
   }
 ) => {
-  const response = await api.patch(`/admin/notices/${id}/`, data);
+  const response = await api.put(`/admin/notices/${id}/`, data);
   return response.data;
 };
 
