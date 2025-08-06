@@ -1,5 +1,10 @@
 import { api } from ".";
 
+export const getNotices = async () => {
+  const response = await api.get("/admin/notices/");
+  return response.data;
+};
+
 export const createNotice = async (data: {
   title: string;
   content: string;
