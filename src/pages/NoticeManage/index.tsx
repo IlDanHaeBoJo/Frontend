@@ -41,6 +41,11 @@ const NoticeManage = () => {
       return;
     }
 
+    if (!title.trim() || !content.trim()) {
+      alert("제목과 내용을 모두 입력해주세요.");
+      return;
+    }
+
     const noticeData = {
       title,
       content,
@@ -131,7 +136,7 @@ const NoticeManage = () => {
           <S.Label>첨부파일</S.Label>
           <S.FileInput>
             <span>파일을 선택하거나 드래그하세요 (최대 10MB)</span>
-            <S.FileButton>📎 파일선택</S.FileButton>
+            <S.FileButton>📎파일선택</S.FileButton>
           </S.FileInput>
         </S.InputGroup>
         <S.ButtonSection>
