@@ -3,19 +3,23 @@ import styled from "styled-components";
 export const Container = styled.div`
   display: flex;
   gap: 40px;
+  max-width: fit-content;
+  margin: 0 auto;
   padding: 40px;
+  margin: 0 auto;
   background-color: #fcfcff;
 `;
 
 export const FormSection = styled.div`
   width: 650px;
+  min-width: 520px;
   background-color: #ffffff;
   border: 1px solid #e5edff;
   border-radius: 16px;
   padding: 30px;
 `;
 
-export const FormTitle = styled.h2`
+export const FormTitle = styled.div`
   font-family: "Inter", sans-serif;
   font-weight: 700;
   font-size: 28px;
@@ -45,6 +49,7 @@ export const Input = styled.input`
   border-radius: 8px;
   font-family: "Inter", sans-serif;
   font-size: 16px;
+  box-sizing: border-box;
 `;
 
 export const Select = styled.select`
@@ -68,6 +73,7 @@ export const Textarea = styled.textarea`
   font-family: "Inter", sans-serif;
   font-size: 16px;
   resize: vertical;
+  box-sizing: border-box;
 `;
 
 export const FileInput = styled.div`
@@ -83,6 +89,7 @@ export const FileInput = styled.div`
   font-family: "Inter", sans-serif;
   font-size: 16px;
   color: #9999b2;
+  box-sizing: border-box;
 `;
 
 export const FileButton = styled.button`
@@ -130,6 +137,19 @@ export const PublishButton = styled.button`
   cursor: pointer;
 `;
 
+export const CancelButton = styled.button`
+  width: 130px;
+  height: 50px;
+  background-color: #f2f2f2;
+  border: 1px solid #d9d9d9;
+  border-radius: 8px;
+  font-family: "Inter", sans-serif;
+  font-weight: 600;
+  font-size: 16px;
+  color: #666680;
+  cursor: pointer;
+`;
+
 export const ListSection = styled.div`
   width: 640px;
   background-color: #ffffff;
@@ -138,7 +158,7 @@ export const ListSection = styled.div`
   padding: 30px;
 `;
 
-export const ListTitle = styled.h2`
+export const ListTitle = styled.div`
   font-family: "Inter", sans-serif;
   font-weight: 700;
   font-size: 24px;
