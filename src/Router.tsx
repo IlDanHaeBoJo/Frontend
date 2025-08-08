@@ -2,6 +2,7 @@ import React from "react";
 import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
 import { api } from "./apis";
 import Layout from "./components/Layout";
+import { PracticeProvider } from "./store/PracticeContext";
 import Login from "./pages/Login";
 import Practice from "./pages/Practice";
 import PracticeProgress from "./pages/PracticeProgress";
@@ -27,7 +28,13 @@ const Router = () => {
   return (
     <BrowserRouter>
       <Routes>
-        <Route element={<Layout />}>
+        <Route
+          element={
+            <PracticeProvider>
+              <Layout />
+            </PracticeProvider>
+          }
+        >
           <Route
             path="/"
             element={
