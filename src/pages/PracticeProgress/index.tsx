@@ -18,6 +18,7 @@ const PracticeProgress = () => {
   // 상태 관리
   const [isConnected, setIsConnected] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
   const [statusMessage, setStatusMessage] = useState("대기 중");
   const [patientName, setPatientName] = useState("환자");
   const [conversation, setConversation] = useState<
@@ -33,6 +34,36 @@ const PracticeProgress = () => {
   const audioSource = useRef<MediaStreamAudioSourceNode | null>(null);
   const audioWorkletNode = useRef<AudioWorkletNode | null>(null);
   const audioPlayer = useRef<HTMLAudioElement | null>(null);
+  const audioQueue = useRef<string[]>([]);
+
+  const processAudioQueue = useCallback(async () => {
+    if (isPlaying || audioQueue.current.length === 0) {
+      return;
+    }
+
+    setIsPlaying(true);
+    const audioUrl = audioQueue.current.shift();
+
+    if (audioUrl && audioPlayer.current) {
+      try {
+        const correctedUrl = audioUrl.replace("/static/audio/", "/cache/tts/");
+        const response = await fetch(`http://localhost:8000${correctedUrl}`);
+        const audioBlob = await response.blob();
+        const objectUrl = URL.createObjectURL(audioBlob);
+        audioPlayer.current.src = objectUrl;
+        audioPlayer.current.play();
+        audioPlayer.current.onended = () => {
+          URL.revokeObjectURL(objectUrl);
+          setIsPlaying(false);
+        };
+      } catch (error) {
+        console.error("Error fetching or playing audio:", error);
+        setIsPlaying(false);
+      }
+    } else {
+      setIsPlaying(false);
+    }
+  }, [isPlaying]);
 
   // 웹소켓 연결 및 해제
   const connectWebSocket = useCallback(() => {
@@ -96,16 +127,10 @@ const PracticeProgress = () => {
             { speaker: "ai", text: message.ai_text! },
           ]);
         }
-        if (message.audio_url && audioPlayer.current) {
-          // TTS 재생 로직 (에코 방지 포함)
-          setIsRecording(false); // TTS 재생 중 녹음 중단
-          audioPlayer.current.src = `http://localhost:8000${message.audio_url}`;
-          audioPlayer.current.play().finally(() => {
-            // 재생이 끝나면 다시 녹음 시작 (사용자가 원할 경우)
-            if (websocket.current?.readyState === WebSocket.OPEN) {
-              setIsRecording(true);
-            }
-          });
+        if (message.audio_url) {
+          setIsRecording(false); // TTS 수신 시 녹음 중단
+          audioQueue.current.push(message.audio_url);
+          processAudioQueue();
         }
         break;
       case "conversation_ended":
@@ -167,6 +192,11 @@ const PracticeProgress = () => {
       return;
     }
 
+    if (isPlaying) {
+      setStatusMessage("환자가 말하는 중입니다...");
+      return;
+    }
+
     if (!isRecording) {
       await initAudio();
       setIsRecording(true);
@@ -204,6 +234,12 @@ const PracticeProgress = () => {
       audioSource.current?.disconnect();
     }
   }, [isRecording]);
+
+  useEffect(() => {
+    if (!isPlaying) {
+      processAudioQueue();
+    }
+  }, [isPlaying, processAudioQueue]);
 
   return (
     <S.Container>
