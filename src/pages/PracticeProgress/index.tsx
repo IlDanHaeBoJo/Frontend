@@ -29,6 +29,8 @@ const PracticeProgress = () => {
   // Ref 관리
   const websocket = useRef<WebSocket | null>(null);
   const audioContext = useRef<AudioContext | null>(null);
+  const audioStream = useRef<MediaStream | null>(null);
+  const audioSource = useRef<MediaStreamAudioSourceNode | null>(null);
   const audioWorkletNode = useRef<AudioWorkletNode | null>(null);
   const audioPlayer = useRef<HTMLAudioElement | null>(null);
 
@@ -113,46 +115,64 @@ const PracticeProgress = () => {
     }
   };
 
-  // 오디오 처리 시작
-  const startAudioProcessing = async () => {
-    if (!isRecording) return;
-
+  // 오디오 처리 초기화
+  const initAudio = useCallback(async () => {
     try {
       if (!audioContext.current) {
         audioContext.current = new AudioContext({ sampleRate: 16000 });
         await audioContext.current.audioWorklet.addModule("/audioProcessor.js");
       }
 
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const source = audioContext.current.createMediaStreamSource(stream);
-      audioWorkletNode.current = new AudioWorkletNode(
-        audioContext.current,
-        "audio-processor"
-      );
+      if (audioContext.current.state === "suspended") {
+        await audioContext.current.resume();
+      }
 
-      audioWorkletNode.current.port.onmessage = (event) => {
-        if (websocket.current?.readyState === WebSocket.OPEN && isRecording) {
-          websocket.current.send(event.data);
-        }
-      };
+      if (!audioStream.current) {
+        audioStream.current = await navigator.mediaDevices.getUserMedia({
+          audio: {
+            echoCancellation: true,
+            noiseSuppression: true,
+          },
+        });
+      }
 
-      source.connect(audioWorkletNode.current);
-      audioWorkletNode.current.connect(audioContext.current.destination);
+      if (!audioSource.current) {
+        audioSource.current = audioContext.current.createMediaStreamSource(
+          audioStream.current
+        );
+      }
+
+      if (!audioWorkletNode.current) {
+        audioWorkletNode.current = new AudioWorkletNode(
+          audioContext.current,
+          "audio-processor"
+        );
+
+        audioWorkletNode.current.port.onmessage = (event) => {
+          if (websocket.current?.readyState === WebSocket.OPEN) {
+            websocket.current.send(event.data);
+          }
+        };
+      }
     } catch (error) {
-      console.error("Error starting audio processing:", error);
+      console.error("Error initializing audio:", error);
       setStatusMessage("마이크를 사용할 수 없습니다.");
-      setIsRecording(false);
     }
-  };
+  }, []);
 
   // 실습 시작/종료 핸들러
-  const handleToggleRecording = () => {
+  const handleToggleRecording = async () => {
     if (!isConnected) {
       connectWebSocket();
       return;
     }
 
-    setIsRecording((prev) => !prev);
+    if (!isRecording) {
+      await initAudio();
+      setIsRecording(true);
+    } else {
+      setIsRecording(false);
+    }
   };
 
   // 시나리오 선택 핸들러
@@ -171,17 +191,17 @@ const PracticeProgress = () => {
 
     return () => {
       websocket.current?.close();
+      audioStream.current?.getTracks().forEach((track) => track.stop());
       audioContext.current?.close();
     };
   }, [connectWebSocket]);
 
   // 녹음 상태 변경 시 효과
   useEffect(() => {
-    if (isRecording) {
-      startAudioProcessing();
+    if (isRecording && audioSource.current && audioWorkletNode.current) {
+      audioSource.current.connect(audioWorkletNode.current);
     } else {
-      audioWorkletNode.current?.port.postMessage({ command: "stop" });
-      audioWorkletNode.current?.disconnect();
+      audioSource.current?.disconnect();
     }
   }, [isRecording]);
 
