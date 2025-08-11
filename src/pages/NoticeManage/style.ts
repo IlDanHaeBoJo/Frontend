@@ -102,6 +102,59 @@ export const FileButton = styled.button`
   font-weight: 600;
   font-size: 14px;
   cursor: pointer;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: #2952a3;
+  }
+`;
+
+export const FileList = styled.div`
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+`;
+
+export const FileItem = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background-color: #f8f9ff;
+  border: 1px solid #e5edff;
+  border-radius: 6px;
+`;
+
+export const FileInfo = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+`;
+
+export const FileName = styled.span`
+  font-weight: 500;
+  color: #333;
+  font-size: 14px;
+`;
+
+export const FileSize = styled.span`
+  font-size: 12px;
+  color: #666;
+`;
+
+export const RemoveFileButton = styled.button`
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  padding: 4px;
+  border-radius: 4px;
+  color: #e53333;
+  
+  &:hover {
+    background-color: #ffe6e6;
+  }
 `;
 
 export const ButtonSection = styled.div`

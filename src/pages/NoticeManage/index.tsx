@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import * as S from "./style";
 import {
   createNotice,
@@ -16,6 +16,8 @@ const NoticeManage = () => {
   const [important, setImportant] = useState(false);
   const [notices, setNotices] = useState<GetNotice[]>([]);
   const [editingNotice, setEditingNotice] = useState<GetNotice | null>(null);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const fetchNotices = async () => {
     try {
@@ -34,6 +36,22 @@ const NoticeManage = () => {
   useEffect(() => {
     fetchNotices();
   }, []);
+
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (files) {
+      const fileArray = Array.from(files);
+      setSelectedFiles(prev => [...prev, ...fileArray]);
+    }
+  };
+
+  const handleFileButtonClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const removeFile = (index: number) => {
+    setSelectedFiles(prev => prev.filter((_, i) => i !== index));
+  };
 
   const handlePublish = async () => {
     if (!user) {
@@ -73,6 +91,7 @@ const NoticeManage = () => {
     setTitle(notice.title);
     setContent(notice.content);
     setImportant(notice.important);
+    setSelectedFiles([]); // 편집 시 첨부파일 초기화
   };
 
   const resetForm = () => {
@@ -80,6 +99,10 @@ const NoticeManage = () => {
     setTitle("");
     setContent("");
     setImportant(false);
+    setSelectedFiles([]);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
   };
 
   const handleDelete = async (id: number) => {
@@ -131,8 +154,31 @@ const NoticeManage = () => {
           <S.Label>첨부파일</S.Label>
           <S.FileInput>
             <span>파일을 선택하거나 드래그하세요 (최대 10MB)</span>
-            <S.FileButton>📎 파일선택</S.FileButton>
+            <S.FileButton onClick={handleFileButtonClick}>📎 파일선택</S.FileButton>
           </S.FileInput>
+          <input
+            ref={fileInputRef}
+            type="file"
+            multiple
+            onChange={handleFileSelect}
+            style={{ display: 'none' }}
+            accept="image/*,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+          />
+          {selectedFiles.length > 0 && (
+            <S.FileList>
+              {selectedFiles.map((file, index) => (
+                <S.FileItem key={index}>
+                  <S.FileInfo>
+                    <S.FileName>{file.name}</S.FileName>
+                    <S.FileSize>{(file.size / 1024 / 1024).toFixed(2)} MB</S.FileSize>
+                  </S.FileInfo>
+                  <S.RemoveFileButton onClick={() => removeFile(index)}>
+                    ❌
+                  </S.RemoveFileButton>
+                </S.FileItem>
+              ))}
+            </S.FileList>
+          )}
         </S.InputGroup>
         <S.ButtonSection>
           {editingNotice && (
