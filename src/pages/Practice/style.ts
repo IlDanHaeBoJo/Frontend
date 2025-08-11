@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import { colors } from "../../styles/colors";
 
 export const Container = styled.div`
   display: flex;
@@ -6,15 +7,15 @@ export const Container = styled.div`
   align-items: center;
   gap: 40px;
   padding: 100px 50px;
-  background-color: #ffffff;
+  background-color: ${colors.white};
 `;
 
 export const OptionBox = styled.div`
   width: 460px;
   height: 400px;
   padding: 20px;
-  background-color: #f2f7ff;
-  border: 1px solid #ccd9ff;
+  background-color: ${colors.cloudBlue1};
+  border: 1px solid ${colors.lavenderBlue3};
   border-radius: 8px;
   display: flex;
   flex-direction: column;
@@ -26,14 +27,14 @@ export const Title = styled.h2`
   font-family: "Inter", sans-serif;
   font-weight: 700;
   font-size: 28px;
-  color: #000000;
+  color: ${colors.black};
   margin-bottom: 20px;
 `;
 
 export const Description = styled.p`
   font-family: "Inter", sans-serif;
   font-size: 18px;
-  color: #666666;
+  color: ${colors.gray600};
   margin-bottom: 30px;
 `;
 
@@ -41,8 +42,8 @@ export const Dropdown = styled.div<{ isHidden?: boolean }>`
   width: 380px;
   height: 50px;
   padding: 0 20px;
-  background-color: #ffffff;
-  border: 1px solid #b3b3b3;
+  background-color: ${colors.white};
+  border: 1px solid ${colors.gray400};
   border-radius: 4px;
   display: flex;
   justify-content: space-between;
@@ -55,23 +56,23 @@ export const Dropdown = styled.div<{ isHidden?: boolean }>`
   span {
     font-family: "Inter", sans-serif;
     font-size: 16px;
-    color: #808080;
+    color: ${colors.gray500};
   }
 `;
 
 export const StartButton = styled.button`
   width: 380px;
   height: 60px;
-  background-color: #3366cc;
+  background-color: ${colors.blue};
   border: none;
   border-radius: 4px;
   font-family: "Inter", sans-serif;
   font-weight: 700;
   font-size: 20px;
-  color: #ffffff;
+  color: ${colors.white};
   cursor: pointer;
 
   &:hover {
-    background-color: #254e99;
+    background-color: ${colors.darkBlue};
   }
 `;

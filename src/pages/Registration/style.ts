@@ -1,17 +1,18 @@
 import styled from "styled-components";
+import { colors } from "../../styles/colors";
 
 export const Container = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
   height: calc(100vh - 90px);
-  background-color: #f0f2f5;
+  background-color: ${colors.lavenderBlue1};
 `;
 
 export const RegistrationBox = styled.div`
   width: 500px;
   padding: 40px;
-  background-color: #ffffff;
+  background-color: ${colors.white};
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   display: flex;
@@ -23,7 +24,7 @@ export const Title = styled.h2`
   font-family: "Inter", sans-serif;
   font-weight: 700;
   font-size: 28px;
-  color: #000000;
+  color: ${colors.black};
   margin-bottom: 40px;
 `;
 
@@ -31,8 +32,8 @@ export const Input = styled.input`
   width: 380px;
   height: 50px;
   padding: 0 20px;
-  background-color: #ffffff;
-  border: 1px solid #b2b2b2;
+  background-color: ${colors.white};
+  border: 1px solid ${colors.gray400};
   border-radius: 4px;
   margin-bottom: 20px;
   font-family: "Inter", sans-serif;
@@ -40,25 +41,25 @@ export const Input = styled.input`
   box-sizing: border-box;
 
   &::placeholder {
-    color: #808080;
+    color: ${colors.gray500};
   }
 `;
 
 export const RegistrationButton = styled.button`
   width: 380px;
   height: 60px;
-  background-color: #3366cc;
+  background-color: ${colors.blue};
   border: none;
   border-radius: 4px;
   font-family: "Inter", sans-serif;
   font-weight: 700;
   font-size: 20px;
-  color: #ffffff;
+  color: ${colors.white};
   cursor: pointer;
   margin: 20px 0;
 
   &:hover {
-    background-color: #254e99;
+    background-color: ${colors.darkBlue};
   }
 `;
 
@@ -70,9 +71,10 @@ export const ToggleButtonContainer = styled.div`
 export const ToggleButton = styled.button<{ active: boolean }>`
   width: 190px;
   height: 50px;
-  background-color: ${(props) => (props.active ? "#3366cc" : "#f0f2f5")};
-  color: ${(props) => (props.active ? "#ffffff" : "#333333")};
-  border: 1px solid ${(props) => (props.active ? "#3366cc" : "#dcdcdc")};
+  background-color: ${(props) =>
+    props.active ? colors.blue : colors.lavenderBlue1};
+  color: ${(props) => (props.active ? colors.white : colors.gray700)};
+  border: 1px solid ${(props) => (props.active ? colors.blue : "#dcdcdc")};
   font-family: "Inter", sans-serif;
   font-weight: 700;
   font-size: 16px;
@@ -91,12 +93,13 @@ export const ToggleButton = styled.button<{ active: boolean }>`
   }
 
   &:hover {
-    background-color: ${(props) => (props.active ? "#254e99" : "#e9ecef")};
+    background-color: ${(props) =>
+      props.active ? colors.darkBlue : "#e9ecef"};
   }
 `;
 
 export const ErrorMsg = styled.p`
-  color: red;
+  color: ${colors.red};
   font-size: 12px;
   margin-top: -15px;
   margin-bottom: 10px;

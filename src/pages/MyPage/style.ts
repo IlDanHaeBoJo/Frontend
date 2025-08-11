@@ -1,10 +1,11 @@
 import styled from "styled-components";
+import { colors } from "../../styles/colors";
 
 export const Container = styled.div`
   padding: 40px;
   max-width: 1500px;
   margin: 0 auto;
-  background-color: #ffffff;
+  background-color: ${colors.white};
 `;
 
 export const ProfileSection = styled.div`
@@ -12,8 +13,8 @@ export const ProfileSection = styled.div`
   align-items: center;
   gap: 30px;
   padding: 40px;
-  background-color: #ffffff;
-  border: 1px solid #ccd9ff;
+  background-color: ${colors.white};
+  border: 1px solid ${colors.lavenderBlue3};
   border-radius: 16px;
   margin-bottom: 30px;
 `;
@@ -21,7 +22,7 @@ export const ProfileSection = styled.div`
 export const ProfileImage = styled.div`
   width: 120px;
   height: 120px;
-  background-color: #e6e6e6;
+  background-color: ${colors.gray200};
   border-radius: 60px;
 `;
 
@@ -29,14 +30,14 @@ export const UserName = styled.h1`
   font-family: "Inter", sans-serif;
   font-weight: 700;
   font-size: 32px;
-  color: #1a1a1a;
+  color: ${colors.gray800};
   margin: 0;
 `;
 
 export const UserEmail = styled.p`
   font-family: "Inter", sans-serif;
   font-size: 18px;
-  color: #666666;
+  color: ${colors.gray600};
   margin: 10px 0 0 0;
 `;
 
@@ -47,8 +48,8 @@ export const InfoSection = styled.div`
 `;
 
 export const InfoCard = styled.div`
-  background-color: #ffffff;
-  border: 1px solid #ccd9ff;
+  background-color: ${colors.white};
+  border: 1px solid ${colors.lavenderBlue3};
   border-radius: 16px;
   padding: 30px;
 `;
@@ -57,7 +58,7 @@ export const CardTitle = styled.h2`
   font-family: "Inter", sans-serif;
   font-weight: 700;
   font-size: 24px;
-  color: #1a1a1a;
+  color: ${colors.gray800};
   margin-bottom: 30px;
 `;
 
@@ -68,7 +69,7 @@ export const InfoItem = styled.div`
 export const InfoLabel = styled.p`
   font-family: "Inter", sans-serif;
   font-size: 16px;
-  color: #666666;
+  color: ${colors.gray600};
   margin: 0 0 5px 0;
 `;
 
@@ -76,14 +77,14 @@ export const InfoValue = styled.p`
   font-family: "Inter", sans-serif;
   font-weight: 600;
   font-size: 18px;
-  color: #1a1a1a;
+  color: ${colors.gray800};
   margin: 0;
 `;
 
 export const InputLabel = styled.p`
   font-family: "Inter", sans-serif;
   font-size: 16px;
-  color: #666666;
+  color: ${colors.gray600};
   margin: 20px 0 5px 0;
 `;
 
@@ -91,8 +92,8 @@ export const Input = styled.input`
   width: 100%;
   height: 50px;
   padding: 0 15px;
-  background-color: #ffffff;
-  border: 1px solid #cccccc;
+  background-color: ${colors.white};
+  border: 1px solid ${colors.gray300};
   border-radius: 8px;
   font-family: "Inter", sans-serif;
   font-size: 16px;
@@ -103,16 +104,16 @@ export const Button = styled.button`
   width: 100%;
   height: 50px;
   margin-top: 30px;
-  background-color: #3366cc;
+  background-color: ${colors.blue};
   border: none;
   border-radius: 8px;
   font-family: "Inter", sans-serif;
   font-weight: 700;
   font-size: 18px;
-  color: #ffffff;
+  color: ${colors.white};
   cursor: pointer;
 
   &:hover {
-    background-color: #254e99;
+    background-color: ${colors.darkBlue};
   }
 `;

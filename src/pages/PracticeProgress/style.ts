@@ -1,8 +1,9 @@
 import styled from "styled-components";
+import { colors } from "../../styles/colors";
 
 export const Container = styled.div`
   padding: 20px;
-  background-color: #ffffff;
+  background-color: ${colors.white};
 `;
 
 export const ControlSection = styled.div`
@@ -17,7 +18,7 @@ export const Timer = styled.div`
   font-family: "Inter", sans-serif;
   font-weight: 700;
   font-size: 32px;
-  color: #333333;
+  color: ${colors.gray700};
 `;
 
 export const Button = styled.button`
@@ -28,9 +29,9 @@ export const Button = styled.button`
   font-family: "Inter", sans-serif;
   font-weight: 700;
   font-size: 16px;
-  color: #ffffff;
+  color: ${colors.white};
   cursor: pointer;
-  background-color: #3366cc;
+  background-color: ${colors.blue};
 
   &:disabled {
     background-color: #a69e96;
@@ -39,7 +40,7 @@ export const Button = styled.button`
 `;
 
 export const SubmitButton = styled(Button)`
-  background-color: #29a645;
+  background-color: ${colors.green};
 `;
 
 export const PracticeArea = styled.div`
@@ -64,7 +65,7 @@ export const PatientAvatar = styled.div`
   line-height: 250px;
   text-align: center;
   background-color: #5980b2;
-  color: #ffffff;
+  color: ${colors.white};
   border-radius: 125px;
   font-size: 100px;
   margin-bottom: 20px;
@@ -74,14 +75,14 @@ export const PatientName = styled.div`
   font-family: "Inter", sans-serif;
   font-weight: 700;
   font-size: 28px;
-  color: #33334d;
+  color: ${colors.indigoGray3};
   margin-bottom: 10px;
 `;
 
 export const StatusBadge = styled.div`
   padding: 10px 20px;
   background-color: #3d6699;
-  color: #ffffff;
+  color: ${colors.white};
   border-radius: 22px;
   font-family: "Inter", sans-serif;
   font-weight: 600;
@@ -96,8 +97,8 @@ export const InfoPanel = styled.div`
 `;
 
 export const InfoCard = styled.div`
-  background-color: #fcfcff;
-  border: 1px solid #e5edff;
+  background-color: ${colors.whiteBlue};
+  border: 1px solid ${colors.cloudBlue2};
   border-radius: 16px;
   padding: 20px;
 `;
@@ -116,7 +117,7 @@ export const CardHeader = styled.div`
     font-family: "Inter", sans-serif;
     font-weight: 700;
     font-size: 20px;
-    color: #1a1a33;
+    color: ${colors.indigoGray4};
   }
 `;
 
@@ -125,18 +126,18 @@ export const InfoGrid = styled.div`
     font-family: "Inter", sans-serif;
     font-weight: 500;
     font-size: 16px;
-    color: #33334d;
+    color: ${colors.indigoGray3};
   }
 `;
 
 export const NotesCard = styled(InfoCard)`
-  background-color: #fafcfc;
-  border: 1px solid #e5ebf2;
+  background-color: ${colors.whiteBlue};
+  border: 1px solid ${colors.lavenderBlue2};
 `;
 
 export const NotesArea = styled.div`
   font-family: "Inter", sans-serif;
   font-size: 14px;
-  color: #808080;
+  color: ${colors.gray500};
   line-height: 1.5;
 `;

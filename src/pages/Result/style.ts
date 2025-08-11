@@ -1,20 +1,21 @@
 import styled from "styled-components";
+import { colors } from "../../styles/colors";
 
 export const Container = styled.div`
   padding: 50px;
-  background-color: #ffffff;
+  background-color: ${colors.white};
 `;
 
 export const Board = styled.div`
   width: 1100px;
   height: 660px;
   margin: 0 auto;
-  border: 1px solid #e6e6e6;
+  border: 1px solid ${colors.gray200};
 `;
 
 export const BoardHeader = styled.div`
   display: flex;
-  background-color: #f2f7ff;
+  background-color: ${colors.cloudBlue1};
   height: 50px;
   align-items: center;
   padding: 0 20px;
@@ -24,7 +25,7 @@ export const HeaderItem = styled.div`
   font-family: "Inter", sans-serif;
   font-weight: 700;
   font-size: 16px;
-  color: #000000;
+  color: ${colors.black};
   text-align: center;
   flex: 1;
 `;
@@ -34,7 +35,7 @@ export const BoardRow = styled.div`
   height: 60px;
   align-items: center;
   padding: 0 20px;
-  border-bottom: 1px solid #e6e6e6;
+  border-bottom: 1px solid ${colors.gray200};
   cursor: pointer;
 
   &:last-child {
@@ -42,14 +43,14 @@ export const BoardRow = styled.div`
   }
 
   &:hover {
-    background-color: #f2f7ff;
+    background-color: ${colors.cloudBlue1};
   }
 `;
 
 export const RowItem = styled.div`
   font-family: "Inter", sans-serif;
   font-size: 16px;
-  color: #000000;
+  color: ${colors.black};
   text-align: center;
   flex: 1;
 `;
@@ -65,12 +66,12 @@ export const StatusTag = styled.div<{ status: string }>`
       case "진행중":
         return `
           background-color: #e5f2ff;
-          color: #3366cc;
+          color: ${colors.blue};
         `;
       case "완료":
         return `
           background-color: #d9ffe5;
-          color: #1a8033;
+          color: ${colors.green};
         `;
       case "이의신청":
         return `
@@ -105,7 +106,7 @@ export const ModalOverlay = styled.div`
 export const ModalWrapper = styled.div`
   width: 1200px;
   height: 90vh;
-  background-color: #ffffff;
+  background-color: ${colors.white};
   border-radius: 8px;
   overflow: hidden;
   display: flex;
@@ -145,12 +146,13 @@ export const SectionTitle = styled.h2`
   font-weight: 700;
   font-size: 24px;
   margin: 5px 0 20px;
-  color: #000000;
+  color: ${colors.black};
   margin-bottom: 20px;
 `;
 
 export const ConversationBox = styled.div`
   background-color: #fafafa;
+  //background-color: ${colors.whiteBlue};
   padding: 20px;
   border-radius: 8px;
   min-height: 250px;
@@ -161,14 +163,14 @@ export const ConversationBox = styled.div`
 `;
 
 export const FeedbackSection = styled(Section)`
-  border: 1px solid #e6e6e6;
+  border: 1px solid ${colors.gray200};
   padding: 30px;
   border-radius: 8px;
 `;
 
 export const ProfessorFeedbackSection = styled(FeedbackSection)`
   background-color: #f2fff2;
-  border-color: #cce5cc;
+  border-color: ${colors.gray300};
 `;
 
 export const FeedbackContent = styled.div`
@@ -188,7 +190,7 @@ export const PdfButton = styled.button`
   width: 200px;
   height: 50px;
   background-color: #4d4d4d;
-  color: #ffffff;
+  color: ${colors.white};
   border: none;
   border-radius: 4px;
   font-family: "Inter", sans-serif;
@@ -200,7 +202,7 @@ export const PdfButton = styled.button`
 `;
 
 export const LoadingSpinner = styled.div`
-  border: 8px solid #f3f3f3;
+  border: 8px solid ${colors.gray100};
   border-top: 8px solid #3498db;
   border-radius: 50%;
   width: 60px;
@@ -229,14 +231,15 @@ export const PaginationContainer = styled.div`
 export const PageButton = styled.button<{ isActive: boolean }>`
   padding: 8px 12px;
   margin: 0 5px;
-  background-color: ${({ isActive }) => (isActive ? "#3366cc" : "#ffffff")};
-  color: ${({ isActive }) => (isActive ? "#ffffff" : "#333333")};
-  border: 1px solid #cccccc;
+  background-color: ${({ isActive }) =>
+    isActive ? colors.blue : colors.white};
+  color: ${({ isActive }) => (isActive ? colors.white : colors.gray700)};
+  border: 1px solid ${colors.gray300};
   border-radius: 4px;
   cursor: pointer;
   font-size: 16px;
 
   &:hover {
-    background-color: #f2f2f2;
+    background-color: ${colors.gray100};
   }
 `;
