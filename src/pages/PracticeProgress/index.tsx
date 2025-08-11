@@ -1,53 +1,244 @@
-import React from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import * as S from "./style";
 
+// 오디오 처리 관련 타입 정의
+interface ServerMessage {
+  type: string;
+  message?: string;
+  user_text?: string;
+  ai_text?: string;
+  audio_url?: string;
+  avatar_action?: string;
+  conversation_ended?: boolean;
+  scenarios?: Record<string, { name: string; description: string }>;
+  scenario_name?: string;
+}
+
 const PracticeProgress = () => {
+  // 상태 관리
+  const [isConnected, setIsConnected] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+  const [statusMessage, setStatusMessage] = useState("대기 중");
+  const [patientName, setPatientName] = useState("환자");
+  const [conversation, setConversation] = useState<
+    { speaker: "user" | "ai"; text: string }[]
+  >([]);
+  const [scenarios, setScenarios] = useState<ServerMessage["scenarios"]>({});
+  const [selectedScenario, setSelectedScenario] = useState("");
+
+  // Ref 관리
+  const websocket = useRef<WebSocket | null>(null);
+  const audioContext = useRef<AudioContext | null>(null);
+  const audioWorkletNode = useRef<AudioWorkletNode | null>(null);
+  const audioPlayer = useRef<HTMLAudioElement | null>(null);
+
+  // 웹소켓 연결 및 해제
+  const connectWebSocket = useCallback(() => {
+    const userId = `user_${Date.now()}`; // 임시 사용자 ID
+    const wsUrl = `ws://localhost:8000/ws/${userId}`;
+
+    if (websocket.current) {
+      websocket.current.close();
+    }
+
+    const ws = new WebSocket(wsUrl);
+
+    ws.onopen = () => {
+      console.log("WebSocket connected");
+      setIsConnected(true);
+      setStatusMessage("서버에 연결되었습니다. 시나리오를 선택해주세요.");
+    };
+
+    ws.onmessage = (event) => {
+      const message: ServerMessage = JSON.parse(event.data);
+      console.log("Received message:", message);
+      handleServerMessage(message);
+    };
+
+    ws.onclose = () => {
+      console.log("WebSocket disconnected");
+      setIsConnected(false);
+      setIsRecording(false);
+      setStatusMessage("연결이 끊어졌습니다. 다시 시도해주세요.");
+    };
+
+    ws.onerror = (error) => {
+      console.error("WebSocket error:", error);
+      setStatusMessage("연결 오류가 발생했습니다.");
+    };
+
+    websocket.current = ws;
+  }, []);
+
+  // 서버 메시지 처리
+  const handleServerMessage = (message: ServerMessage) => {
+    setStatusMessage(message.message || statusMessage);
+
+    switch (message.type) {
+      case "scenario_selection":
+        setScenarios(message.scenarios || {});
+        break;
+      case "scenario_selected":
+        setPatientName(message.scenario_name || "환자");
+        break;
+      case "voice_response":
+        if (message.user_text) {
+          setConversation((prev) => [
+            ...prev,
+            { speaker: "user", text: message.user_text! },
+          ]);
+        }
+        if (message.ai_text) {
+          setConversation((prev) => [
+            ...prev,
+            { speaker: "ai", text: message.ai_text! },
+          ]);
+        }
+        if (message.audio_url && audioPlayer.current) {
+          // TTS 재생 로직 (에코 방지 포함)
+          setIsRecording(false); // TTS 재생 중 녹음 중단
+          audioPlayer.current.src = `http://localhost:8000${message.audio_url}`;
+          audioPlayer.current.play().finally(() => {
+            // 재생이 끝나면 다시 녹음 시작 (사용자가 원할 경우)
+            if (websocket.current?.readyState === WebSocket.OPEN) {
+              setIsRecording(true);
+            }
+          });
+        }
+        break;
+      case "conversation_ended":
+        setIsRecording(false);
+        // 세션 종료 처리
+        break;
+    }
+  };
+
+  // 오디오 처리 시작
+  const startAudioProcessing = async () => {
+    if (!isRecording) return;
+
+    try {
+      if (!audioContext.current) {
+        audioContext.current = new AudioContext({ sampleRate: 16000 });
+        await audioContext.current.audioWorklet.addModule("/audioProcessor.js");
+      }
+
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const source = audioContext.current.createMediaStreamSource(stream);
+      audioWorkletNode.current = new AudioWorkletNode(
+        audioContext.current,
+        "audio-processor"
+      );
+
+      audioWorkletNode.current.port.onmessage = (event) => {
+        if (websocket.current?.readyState === WebSocket.OPEN && isRecording) {
+          websocket.current.send(event.data);
+        }
+      };
+
+      source.connect(audioWorkletNode.current);
+      audioWorkletNode.current.connect(audioContext.current.destination);
+    } catch (error) {
+      console.error("Error starting audio processing:", error);
+      setStatusMessage("마이크를 사용할 수 없습니다.");
+      setIsRecording(false);
+    }
+  };
+
+  // 실습 시작/종료 핸들러
+  const handleToggleRecording = () => {
+    if (!isConnected) {
+      connectWebSocket();
+      return;
+    }
+
+    setIsRecording((prev) => !prev);
+  };
+
+  // 시나리오 선택 핸들러
+  const handleSelectScenario = (scenarioId: string) => {
+    if (websocket.current?.readyState === WebSocket.OPEN) {
+      setSelectedScenario(scenarioId);
+      const command = { type: "select_scenario", scenario_id: scenarioId };
+      websocket.current.send(JSON.stringify(command));
+    }
+  };
+
+  // 컴포넌트 마운트/언마운트 시 효과
+  useEffect(() => {
+    connectWebSocket();
+    audioPlayer.current = new Audio();
+
+    return () => {
+      websocket.current?.close();
+      audioContext.current?.close();
+    };
+  }, [connectWebSocket]);
+
+  // 녹음 상태 변경 시 효과
+  useEffect(() => {
+    if (isRecording) {
+      startAudioProcessing();
+    } else {
+      audioWorkletNode.current?.port.postMessage({ command: "stop" });
+      audioWorkletNode.current?.disconnect();
+    }
+  }, [isRecording]);
+
   return (
     <S.Container>
       <S.ControlSection>
         <S.Timer>00:00</S.Timer>
-        <S.Button>실습 시작</S.Button>
-        <S.Button disabled>실습 종료</S.Button>
+        <S.Button onClick={handleToggleRecording} disabled={!isConnected}>
+          {isRecording ? "실습 중지" : "실습 시작"}
+        </S.Button>
+        <S.Button disabled={!isRecording}>실습 종료</S.Button>
         <S.SubmitButton>✅ 제출</S.SubmitButton>
       </S.ControlSection>
       <S.PracticeArea>
         <S.PatientVideoArea>
           <S.PatientAvatar>👨‍💼</S.PatientAvatar>
-          <S.PatientName>김민준 (45세)</S.PatientName>
-          <S.StatusBadge>🟢 대화 준비 완료</S.StatusBadge>
+          <S.PatientName>{patientName}</S.PatientName>
+          <S.StatusBadge>
+            {isConnected
+              ? isRecording
+                ? "🟢 대화 중"
+                : "🟡 대기 중"
+              : "🔴 연결 끊김"}
+          </S.StatusBadge>
         </S.PatientVideoArea>
         <S.InfoPanel>
           <S.InfoCard>
             <S.CardHeader>
               <span>📋</span>
-              <span>환자 정보</span>
+              <span>시나리오 선택</span>
             </S.CardHeader>
             <S.InfoGrid>
-              <p>👤 이름: 김민준 (45세 남성)</p>
+              {Object.entries(scenarios || {}).map(([id, { name }]) => (
+                <S.Button
+                  key={id}
+                  onClick={() => handleSelectScenario(id)}
+                  disabled={isRecording || selectedScenario === id}
+                >
+                  {name}
+                </S.Button>
+              ))}
             </S.InfoGrid>
           </S.InfoCard>
           <S.NotesCard>
             <S.CardHeader>
               <span>✍️</span>
-              <span>메모장</span>
+              <span>대화 내용</span>
             </S.CardHeader>
             <S.NotesArea>
-              • 환자와의 대화 내용을 실시간으로 기록합니다
-              <br />
-              • 주요 증상과 관찰 사항을 정리하세요
-              <br />
-              • 진단 과정과 감별진단을 작성하세요
-              <br />
-              <br />
-              📝 메모 작성 영역:
-              <br />
-              _________________________________
-              <br />
-              _________________________________
-              <br />
-              _________________________________
-              <br />
-              _________________________________
+              {conversation.map((entry, index) => (
+                <div key={index}>
+                  <strong>
+                    {entry.speaker === "user" ? "나: " : "환자: "}
+                  </strong>
+                  {entry.text}
+                </div>
+              ))}
             </S.NotesArea>
           </S.NotesCard>
         </S.InfoPanel>
