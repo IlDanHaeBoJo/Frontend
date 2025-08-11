@@ -24,8 +24,6 @@ const PracticeProgress = () => {
   const [conversation, setConversation] = useState<
     { speaker: "user" | "ai"; text: string }[]
   >([]);
-  const [scenarios, setScenarios] = useState<ServerMessage["scenarios"]>({});
-  const [selectedScenario, setSelectedScenario] = useState("");
 
   // Ref 관리
   const websocket = useRef<WebSocket | null>(null);
@@ -47,7 +45,9 @@ const PracticeProgress = () => {
     if (audioUrl && audioPlayer.current) {
       try {
         const correctedUrl = audioUrl.replace("/static/audio/", "/cache/tts/");
-        const response = await fetch(`http://localhost:8000${correctedUrl}`);
+        const response = await fetch(
+          `${process.env.REACT_APP_API_URL}${correctedUrl}`
+        );
         const audioBlob = await response.blob();
         const objectUrl = URL.createObjectURL(audioBlob);
         audioPlayer.current.src = objectUrl;
@@ -68,7 +68,7 @@ const PracticeProgress = () => {
   // 웹소켓 연결 및 해제
   const connectWebSocket = useCallback(() => {
     const userId = `user_${Date.now()}`; // 임시 사용자 ID
-    const wsUrl = `ws://localhost:8000/ws/${userId}`;
+    const wsUrl = `${process.env.REACT_APP_WEBSOCKET_URL}/ws/${userId}`;
 
     if (websocket.current) {
       websocket.current.close();
@@ -108,10 +108,7 @@ const PracticeProgress = () => {
     setStatusMessage(message.message || statusMessage);
 
     switch (message.type) {
-      case "scenario_selection":
-        setScenarios(message.scenarios || {});
-        break;
-      case "scenario_selected":
+      case "session_started":
         setPatientName(message.scenario_name || "환자");
         break;
       case "voice_response":
@@ -205,15 +202,6 @@ const PracticeProgress = () => {
     }
   };
 
-  // 시나리오 선택 핸들러
-  const handleSelectScenario = (scenarioId: string) => {
-    if (websocket.current?.readyState === WebSocket.OPEN) {
-      setSelectedScenario(scenarioId);
-      const command = { type: "select_scenario", scenario_id: scenarioId };
-      websocket.current.send(JSON.stringify(command));
-    }
-  };
-
   // 컴포넌트 마운트/언마운트 시 효과
   useEffect(() => {
     connectWebSocket();
@@ -222,7 +210,9 @@ const PracticeProgress = () => {
     return () => {
       websocket.current?.close();
       audioStream.current?.getTracks().forEach((track) => track.stop());
-      audioContext.current?.close();
+      if (audioContext.current && audioContext.current.state !== "closed") {
+        audioContext.current.close();
+      }
     };
   }, [connectWebSocket]);
 
@@ -246,9 +236,9 @@ const PracticeProgress = () => {
       <S.ControlSection>
         <S.Timer>00:00</S.Timer>
         <S.Button onClick={handleToggleRecording} disabled={!isConnected}>
-          {isRecording ? "실습 중지" : "실습 시작"}
+          {isRecording ? "대화 중지" : "대화 시작"}
+          {/* 추후에 tts 출력이 끝나고 바로 마이크 입력을 받게 된다면 '실습 시작'이 될 수도 있음. */}
         </S.Button>
-        <S.Button disabled={!isRecording}>실습 종료</S.Button>
         <S.SubmitButton>✅ 제출</S.SubmitButton>
       </S.ControlSection>
       <S.PracticeArea>
@@ -264,23 +254,6 @@ const PracticeProgress = () => {
           </S.StatusBadge>
         </S.PatientVideoArea>
         <S.InfoPanel>
-          <S.InfoCard>
-            <S.CardHeader>
-              <span>📋</span>
-              <span>시나리오 선택</span>
-            </S.CardHeader>
-            <S.InfoGrid>
-              {Object.entries(scenarios || {}).map(([id, { name }]) => (
-                <S.Button
-                  key={id}
-                  onClick={() => handleSelectScenario(id)}
-                  disabled={isRecording || selectedScenario === id}
-                >
-                  {name}
-                </S.Button>
-              ))}
-            </S.InfoGrid>
-          </S.InfoCard>
           <S.NotesCard>
             <S.CardHeader>
               <span>✍️</span>
