@@ -10,12 +10,13 @@ export const Board = styled.div`
   width: 1100px;
   height: 660px;
   margin: 0 auto;
-  border: 1px solid ${colors.gray200};
 `;
 
 export const BoardHeader = styled.div`
   display: flex;
   background-color: ${colors.cloudBlue1};
+  border-top: 1px solid ${colors.gray200};
+  border-bottom: 1px solid ${colors.gray200};
   height: 50px;
   align-items: center;
   padding: 0 20px;
@@ -37,10 +38,6 @@ export const BoardRow = styled.div`
   padding: 0 20px;
   border-bottom: 1px solid ${colors.gray200};
   cursor: pointer;
-
-  &:last-child {
-    border-bottom: none;
-  }
 
   &:hover {
     background-color: ${colors.cloudBlue1};
@@ -73,12 +70,12 @@ export const StatusTag = styled.div<{ status: string }>`
           background-color: #d9ffe5;
           color: ${colors.green};
         `;
-      case "이의신청":
+      case "오류":
         return `
           background-color: #ffe5cc;
           color: #cc6600;
         `;
-      case "교수님 확인":
+      case "피드백":
         return `
           background-color: #f2e5ff;
           color: #6633cc;
@@ -241,5 +238,6 @@ export const PageButton = styled.button<{ isActive: boolean }>`
 
   &:hover {
     background-color: ${colors.gray100};
+    color: ${colors.gray700};
   }
 `;
