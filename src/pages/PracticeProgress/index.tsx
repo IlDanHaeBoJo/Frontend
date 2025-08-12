@@ -1,19 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import * as S from "./style";
-
-// 오디오 처리 관련 타입 정의
-interface ServerMessage {
-  type: string;
-  message?: string;
-  user_text?: string;
-  ai_text?: string;
-  audio_url?: string;
-  avatar_action?: string;
-  conversation_ended?: boolean;
-  scenarios?: Record<string, { name: string; description: string }>;
-  scenario_name?: string;
-}
+import { ServerMessage } from "../../types/practice";
 
 const PracticeProgress = () => {
   // 상태 관리
