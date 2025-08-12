@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import * as S from "./style";
 
 // 오디오 처리 관련 타입 정의
@@ -19,13 +20,17 @@ const PracticeProgress = () => {
   const [isConnected, setIsConnected] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isPracticeStarted, setIsPracticeStarted] = useState(false);
+  const [timer, setTimer] = useState(0);
   const [statusMessage, setStatusMessage] = useState("대기 중");
   const [patientName, setPatientName] = useState("환자");
   const [conversation, setConversation] = useState<
     { speaker: "user" | "ai"; text: string }[]
   >([]);
+  const navigate = useNavigate();
 
   // Ref 관리
+  const timerInterval = useRef<NodeJS.Timeout | null>(null);
   const websocket = useRef<WebSocket | null>(null);
   const audioContext = useRef<AudioContext | null>(null);
   const audioStream = useRef<MediaStream | null>(null);
@@ -183,6 +188,13 @@ const PracticeProgress = () => {
   }, []);
 
   // 실습 시작/종료 핸들러
+  const handleStartPractice = () => {
+    setIsPracticeStarted(true);
+    timerInterval.current = setInterval(() => {
+      setTimer((prev) => prev + 1);
+    }, 1000);
+  };
+
   const handleToggleRecording = async () => {
     if (!isConnected) {
       connectWebSocket();
@@ -200,6 +212,21 @@ const PracticeProgress = () => {
     } else {
       setIsRecording(false);
     }
+  };
+
+  const handleSubmit = () => {
+    if (timerInterval.current) {
+      clearInterval(timerInterval.current);
+    }
+    setIsRecording(false);
+    if (websocket.current) {
+      websocket.current.close();
+    }
+    // 필요한 경우 오디오 컨텍스트 등 다른 리소스도 정리
+    if (audioContext.current && audioContext.current.state !== "closed") {
+      audioContext.current.close();
+    }
+    navigate("/result");
   };
 
   // 컴포넌트 마운트/언마운트 시 효과
@@ -231,15 +258,29 @@ const PracticeProgress = () => {
     }
   }, [isPlaying, processAudioQueue]);
 
+  const formatTime = (seconds: number) => {
+    const minutes = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${minutes.toString().padStart(2, "0")}:${secs
+      .toString()
+      .padStart(2, "0")}`;
+  };
+
   return (
     <S.Container>
       <S.ControlSection>
-        <S.Timer>00:00</S.Timer>
-        <S.Button onClick={handleToggleRecording} disabled={!isConnected}>
-          {isRecording ? "대화 중지" : "대화 시작"}
-          {/* 추후에 tts 출력이 끝나고 바로 마이크 입력을 받게 된다면 '실습 시작'이 될 수도 있음. */}
+        <S.Timer>{formatTime(timer)}</S.Timer>
+        <S.Button onClick={handleStartPractice} disabled={isPracticeStarted}>
+          실습 시작
         </S.Button>
-        <S.SubmitButton>✅ 제출</S.SubmitButton>
+        <S.Button
+          onClick={handleToggleRecording}
+          disabled={!isConnected || !isPracticeStarted}
+        >
+          {isRecording ? "대화 중지" : "대화 시작"}
+        </S.Button>
+        {/* 추후에 tts 출력이 끝나고 바로 마이크 입력을 받게 된다면 '실습 시작' 버튼 하나로 변경될 수 있음. */}
+        <S.SubmitButton onClick={handleSubmit}>✅ 제출</S.SubmitButton>
       </S.ControlSection>
       <S.PracticeArea>
         <S.PatientVideoArea>
@@ -254,7 +295,25 @@ const PracticeProgress = () => {
           </S.StatusBadge>
         </S.PatientVideoArea>
         <S.InfoPanel>
-          <S.NotesCard>
+          <S.MemoCard>
+            <S.CardHeader>
+              <span>📝</span>
+              <span>메모장</span>
+            </S.CardHeader>
+            <S.MemoArea
+              height="200px"
+              placeholder="이곳에 메모를 작성하세요."
+            />
+          </S.MemoCard>
+          <S.MemoCard>
+            <S.CardHeader>
+              <span>📜</span>
+              <span>진찰 내역</span>
+            </S.CardHeader>
+            <S.MemoArea height="100px" placeholder="진찰 내역을 입력하세요." />
+          </S.MemoCard>
+          {/* 확인용 대화내용 로그 추후에 삭제 */}
+          <S.MemoCard>
             <S.CardHeader>
               <span>✍️</span>
               <span>대화 내용</span>
@@ -269,7 +328,7 @@ const PracticeProgress = () => {
                 </div>
               ))}
             </S.NotesArea>
-          </S.NotesCard>
+          </S.MemoCard>
         </S.InfoPanel>
       </S.PracticeArea>
     </S.Container>
