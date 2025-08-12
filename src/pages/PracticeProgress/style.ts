@@ -46,6 +46,8 @@ export const SubmitButton = styled(Button)`
 export const PracticeArea = styled.div`
   display: flex;
   gap: 20px;
+  width: fit-content;
+  margin: 0 auto;
 `;
 
 export const PatientVideoArea = styled.div`
@@ -57,6 +59,8 @@ export const PatientVideoArea = styled.div`
   background-color: #f7faff;
   border-radius: 20px;
   padding: 20px;
+  width: 700px;
+  height: 450px;
 `;
 
 export const PatientAvatar = styled.div`
@@ -130,9 +134,27 @@ export const InfoGrid = styled.div`
   }
 `;
 
-export const NotesCard = styled(InfoCard)`
+export const MemoCard = styled(InfoCard)`
   background-color: ${colors.whiteBlue};
   border: 1px solid ${colors.lavenderBlue2};
+`;
+
+export const MemoArea = styled.textarea<{ height: string }>`
+  width: 100%;
+  height: ${(props) => props.height};
+  border: 1px solid ${colors.cloudBlue2};
+  border-radius: 8px;
+  padding: 10px;
+  font-family: "Inter", sans-serif;
+  font-size: 14px;
+  color: ${colors.gray500};
+  line-height: 1.5;
+  resize: vertical;
+  box-sizing: border-box;
+  &:focus {
+    outline: none;
+    border-color: ${colors.blue};
+  }
 `;
 
 export const NotesArea = styled.div`
