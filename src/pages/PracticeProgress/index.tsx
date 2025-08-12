@@ -37,9 +37,8 @@ const PracticeProgress = () => {
 
     if (audioUrl && audioPlayer.current) {
       try {
-        const correctedUrl = audioUrl.replace("/static/audio/", "/cache/tts/");
         const response = await fetch(
-          `${process.env.REACT_APP_API_URL}${correctedUrl}`
+          `${process.env.REACT_APP_API_URL}/cache/tts/${audioUrl}`
         );
         const audioBlob = await response.blob();
         const objectUrl = URL.createObjectURL(audioBlob);
