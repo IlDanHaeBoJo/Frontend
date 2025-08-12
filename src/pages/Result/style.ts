@@ -80,6 +80,11 @@ export const StatusTag = styled.div<{ status: string }>`
           background-color: #f2e5ff;
           color: #6633cc;
         `;
+      case "피드백 완료":
+        return `
+          background-color: #f2e5ff;
+          color: #6633cc;
+        `;
       default:
         return "";
     }
@@ -196,6 +201,27 @@ export const PdfButton = styled.button`
   cursor: pointer;
   display: block;
   margin: 40px auto 0;
+`;
+
+export const FeedbackTextarea = styled.textarea`
+  width: 100%;
+  min-height: 150px;
+  padding: 15px;
+  border-radius: 8px;
+  border: 1px solid ${colors.gray300};
+  font-size: 16px;
+  line-height: 1.6;
+  resize: vertical;
+  margin-bottom: 15px;
+`;
+
+export const ScoreInput = styled.input`
+  width: 100px;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid ${colors.gray300};
+  font-size: 16px;
+  text-align: center;
 `;
 
 export const LoadingSpinner = styled.div`

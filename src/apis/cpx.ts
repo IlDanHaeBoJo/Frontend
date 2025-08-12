@@ -9,3 +9,25 @@ export const getCpxResultDetail = async (resultId: number) => {
   const response = await api.get(`/cpx/${resultId}`);
   return response.data;
 };
+
+export const getAdminCpxResultDetail = async (resultId: number) => {
+  const response = await api.get(`/admin/cpx/${resultId}`);
+  return response.data;
+};
+
+export const getStudentCpxResults = async (studentId: number) => {
+  const response = await api.get(`/admin/cpx/students/${studentId}/results`);
+  return response.data;
+};
+
+export const saveCpxFeedback = async (
+  resultId: number,
+  feedback: {
+    overall_score: number;
+    detailed_feedback: string;
+    evaluation_status: "피드백 완료";
+  }
+) => {
+  const response = await api.put(`/admin/cpx/${resultId}/evaluate`, feedback);
+  return response.data;
+};
