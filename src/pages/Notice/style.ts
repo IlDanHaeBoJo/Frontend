@@ -2,8 +2,6 @@ import styled from "styled-components";
 import { colors } from "../../styles/colors";
 
 export const Wrapper = styled.div`
-  margin: 0 auto;
-  width: 1440px;
   //height: 1024px;
   background-color: ${colors.whiteBlue};
 `;
@@ -11,6 +9,8 @@ export const Wrapper = styled.div`
 export const Container = styled.main`
   display: flex;
   gap: 40px;
+  margin: 0 auto;
+  width: 1440px;
   padding: 40px;
 `;
 
