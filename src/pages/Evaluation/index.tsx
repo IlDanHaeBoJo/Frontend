@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import * as S from "./style";
 import { getStudents } from "../../apis/user";
 import { User } from "../../types/user";
 
 const Evaluation = () => {
   const [students, setStudents] = useState<User[]>([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchStudents = async () => {
@@ -41,7 +43,9 @@ const Evaluation = () => {
               최근 실습:{" "}
               {new Date(student.last_practice_date).toLocaleDateString()}
             </S.LastPractice> */}
-            <S.EvalButton>📝 평가하기</S.EvalButton>
+            <S.EvalButton onClick={() => navigate(`/result/${student.id}`)}>
+              📝 평가하기
+            </S.EvalButton>
           </S.StudentCard>
         ))}
       </S.StudentGrid>

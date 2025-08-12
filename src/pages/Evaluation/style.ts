@@ -3,6 +3,8 @@ import { colors } from "../../styles/colors";
 
 export const Container = styled.div`
   padding: 40px;
+  margin: 0 auto;
+  max-width: 1500px;
   background-color: ${colors.white};
 `;
 

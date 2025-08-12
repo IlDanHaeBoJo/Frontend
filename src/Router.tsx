@@ -45,6 +45,7 @@ const Router = () => {
           <Route path="/practice-progress" element={<PracticeProgress />} />
           <Route path="/registration" element={<Registration />} />
           <Route path="/result" element={<Result />} />
+          <Route path="/result/:id" element={<Result />} />
           <Route path="/notice" element={<Notice />} />
           <Route path="/mypage" element={<MyPage />} />
           <Route path="/evaluation" element={<Evaluation />} />

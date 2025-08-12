@@ -1,10 +1,17 @@
 import React, { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
 import * as S from "./style";
 import ResultDetailModal from "./ResultDetailModal";
-import { getMyCpxResults, getCpxResultDetail } from "../../apis/cpx";
+import {
+  getMyCpxResults,
+  getCpxResultDetail,
+  getStudentCpxResults,
+  getAdminCpxResultDetail,
+} from "../../apis/cpx";
 import { CpxResult, ResultDetail } from "../../types/result";
 
 const Result = () => {
+  const { id } = useParams<{ id: string }>();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [results, setResults] = useState<CpxResult[]>([]);
@@ -16,7 +23,12 @@ const Result = () => {
   useEffect(() => {
     const fetchResults = async () => {
       try {
-        const data = await getMyCpxResults();
+        let data;
+        if (id) {
+          data = await getStudentCpxResults(parseInt(id, 10));
+        } else {
+          data = await getMyCpxResults();
+        }
         setResults(data);
       } catch (error) {
         console.error("Failed to fetch results:", error);
@@ -24,7 +36,7 @@ const Result = () => {
     };
 
     fetchResults();
-  }, []);
+  }, [id]);
 
   const totalPages = Math.ceil(results.length / itemsPerPage);
   const currentResults = results.slice(
@@ -36,7 +48,12 @@ const Result = () => {
     setIsModalOpen(true);
     setIsLoading(true);
     try {
-      const data = await getCpxResultDetail(resultId);
+      let data;
+      if (id) {
+        data = await getAdminCpxResultDetail(resultId);
+      } else {
+        data = await getCpxResultDetail(resultId);
+      }
       setSelectedResultDetail(data);
     } catch (error) {
       console.error("Failed to fetch result detail:", error);
@@ -95,6 +112,7 @@ const Result = () => {
           onClose={closeModal}
           isLoading={isLoading}
           resultDetail={selectedResultDetail}
+          isAdmin={!!id}
         />
       )}
     </>
