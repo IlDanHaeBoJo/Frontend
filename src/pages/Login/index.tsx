@@ -33,7 +33,7 @@ const Login = () => {
         setAccessToken(access_token);
         setRefreshToken(refresh_token);
 
-        const meResponse = await api.get("/auth/me");
+        const meResponse = await api.get("/users/me");
         setUser(meResponse.data);
         setIsAuthenticated(true);
 
