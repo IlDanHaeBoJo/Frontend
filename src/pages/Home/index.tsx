@@ -1,9 +1,11 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
+import { useUser } from "../../store/UserContext";
 
 const HomePage: React.FC = () => {
   const navigate = useNavigate();
+  const { isAuthenticated } = useUser();
 
   const handleLoginClick = () => {
     navigate("/login");
@@ -13,7 +15,7 @@ const HomePage: React.FC = () => {
     <Container>
       <Main>
         <Title>
-          번거롭던 CPX 시험,
+          번거롭던 CPX 준비,
           <br />
           이제 AI와 함께 하세요
         </Title>
@@ -46,7 +48,9 @@ const HomePage: React.FC = () => {
             </FeatureDescription>
           </Feature>
         </Features>
-        <LoginButton onClick={handleLoginClick}>로그인 하러 가기</LoginButton>
+        {!isAuthenticated && (
+          <LoginButton onClick={handleLoginClick}>로그인 하러 가기</LoginButton>
+        )}
       </Main>
     </Container>
   );
