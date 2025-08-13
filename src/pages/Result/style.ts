@@ -2,20 +2,22 @@ import styled from "styled-components";
 import { colors } from "../../styles/colors";
 
 export const Container = styled.div`
-  padding: 50px;
+  padding: 50px 50px 0 50px;
   background-color: ${colors.white};
+  height: calc(100vh - 260px);
 `;
 
 export const Board = styled.div`
   width: 1100px;
   height: 660px;
   margin: 0 auto;
-  border: 1px solid ${colors.gray200};
 `;
 
 export const BoardHeader = styled.div`
   display: flex;
   background-color: ${colors.cloudBlue1};
+  border-top: 1px solid ${colors.gray200};
+  border-bottom: 1px solid ${colors.gray200};
   height: 50px;
   align-items: center;
   padding: 0 20px;
@@ -37,10 +39,6 @@ export const BoardRow = styled.div`
   padding: 0 20px;
   border-bottom: 1px solid ${colors.gray200};
   cursor: pointer;
-
-  &:last-child {
-    border-bottom: none;
-  }
 
   &:hover {
     background-color: ${colors.cloudBlue1};
@@ -73,12 +71,17 @@ export const StatusTag = styled.div<{ status: string }>`
           background-color: #d9ffe5;
           color: ${colors.green};
         `;
-      case "이의신청":
+      case "오류":
         return `
           background-color: #ffe5cc;
           color: #cc6600;
         `;
-      case "교수님 확인":
+      case "피드백":
+        return `
+          background-color: #f2e5ff;
+          color: #6633cc;
+        `;
+      case "피드백 완료":
         return `
           background-color: #f2e5ff;
           color: #6633cc;
@@ -201,6 +204,27 @@ export const PdfButton = styled.button`
   margin: 40px auto 0;
 `;
 
+export const FeedbackTextarea = styled.textarea`
+  width: 100%;
+  min-height: 150px;
+  padding: 15px;
+  border-radius: 8px;
+  border: 1px solid ${colors.gray300};
+  font-size: 16px;
+  line-height: 1.6;
+  resize: vertical;
+  margin-bottom: 15px;
+`;
+
+export const ScoreInput = styled.input`
+  width: 100px;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid ${colors.gray300};
+  font-size: 16px;
+  text-align: center;
+`;
+
 export const LoadingSpinner = styled.div`
   border: 8px solid ${colors.gray100};
   border-top: 8px solid #3498db;
@@ -241,5 +265,6 @@ export const PageButton = styled.button<{ isActive: boolean }>`
 
   &:hover {
     background-color: ${colors.gray100};
+    color: ${colors.gray700};
   }
 `;

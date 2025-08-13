@@ -30,7 +30,7 @@ const Notice = () => {
   }, []);
 
   if (!selectedNotice) {
-    return <div>공지사항을 불러오는 중입니다...</div>;
+    return <S.Wrapper>공지사항을 불러오는 중입니다...</S.Wrapper>;
   }
 
   return (

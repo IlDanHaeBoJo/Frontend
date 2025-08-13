@@ -7,7 +7,6 @@ export const Container = styled.div`
   max-width: fit-content;
   margin: 0 auto;
   padding: 40px;
-  margin: 0 auto;
   background-color: ${colors.whiteBlue};
 `;
 

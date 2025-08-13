@@ -2,21 +2,22 @@ import styled from "styled-components";
 import { colors } from "../../styles/colors";
 
 export const Wrapper = styled.div`
-  margin: 0 auto;
-  width: 1440px;
-  //height: 1024px;
   background-color: ${colors.whiteBlue};
+  height: calc(100vh - 90px);
 `;
 
 export const Container = styled.main`
   display: flex;
   gap: 40px;
+  margin: 0 auto;
+  width: 1440px;
   padding: 40px;
 `;
 
 export const NoticeDetails = styled.div`
   width: 750px;
   height: 100%;
+  min-height: 300px;
   padding: 40px;
   background-color: ${colors.white};
   border: 1px solid ${colors.cloudBlue2};
