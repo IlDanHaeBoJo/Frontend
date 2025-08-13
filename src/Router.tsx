@@ -11,6 +11,7 @@ import Notice from "./pages/Notice";
 import MyPage from "./pages/MyPage";
 import Evaluation from "./pages/Evaluation";
 import NoticeManage from "./pages/NoticeManage";
+import HomePage from "./pages/Home";
 
 
 const Router = () => {
@@ -29,23 +30,13 @@ const Router = () => {
     <BrowserRouter>
       <Routes>
         <Route element={<Layout />}>
-          <Route
-            path="/"
-            element={
-              <div style={{ textAlign: "center", marginTop: "50px" }}>
-                <h1>여긴 뭐하징</h1>
-                <Link to="/login">로그인 페이지로 이동</Link>
-                <br />
-                <br />
-                <button onClick={handleMeClick}>내 정보 가져오기</button>
-              </div>
-            }
-          />
+          <Route path="/" element={<HomePage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/practice" element={<Practice />} />
           <Route path="/practice-progress" element={<PracticeProgress />} />
           <Route path="/registration" element={<Registration />} />
           <Route path="/result" element={<Result />} />
+          <Route path="/result/:id" element={<Result />} />
           <Route path="/notice" element={<Notice />} />
           <Route path="/mypage" element={<MyPage />} />
           <Route path="/evaluation" element={<Evaluation />} />

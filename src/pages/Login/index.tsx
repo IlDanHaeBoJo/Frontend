@@ -1,10 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm, SubmitHandler } from "react-hook-form";
 import * as S from "./style";
 import { api, publicApi } from "../../apis";
 import { setAccessToken, setRefreshToken } from "../../store/tokenManager";
 import { useUser } from "../../store/UserContext";
+import ResetPasswordModal from "./ResetPasswordModal";
 
 interface IFormInput {
   username: string;
@@ -14,6 +15,7 @@ interface IFormInput {
 const Login = () => {
   const navigate = useNavigate();
   const { setUser, setIsAuthenticated } = useUser();
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const {
     register,
     handleSubmit,
@@ -22,6 +24,14 @@ const Login = () => {
 
   const handleRegisterClick = () => {
     navigate("/registration");
+  };
+
+  const handleFindPasswordClick = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
   };
 
   const onSubmit: SubmitHandler<IFormInput> = async (data) => {
@@ -33,7 +43,7 @@ const Login = () => {
         setAccessToken(access_token);
         setRefreshToken(refresh_token);
 
-        const meResponse = await api.get("/auth/me");
+        const meResponse = await api.get("/users/me");
         setUser(meResponse.data);
         setIsAuthenticated(true);
 
@@ -48,6 +58,7 @@ const Login = () => {
 
   return (
     <S.Container>
+      {isModalOpen && <ResetPasswordModal onClose={handleCloseModal} />}
       <S.LoginBox as="form" onSubmit={handleSubmit(onSubmit)}>
         <S.Title>로그인</S.Title>
         <S.Input
@@ -62,7 +73,14 @@ const Login = () => {
         />
         {errors.password && <S.ErrorMsg>{errors.password.message}</S.ErrorMsg>}
         <S.LoginButton type="submit">로그인</S.LoginButton>
-        <S.RegisterText onClick={handleRegisterClick}>회원가입</S.RegisterText>
+        <S.RegisterContainer>
+          <S.RegisterText onClick={handleRegisterClick}>
+            회원가입
+          </S.RegisterText>
+          <S.RegisterText onClick={handleFindPasswordClick}>
+            비밀번호 찾기
+          </S.RegisterText>
+        </S.RegisterContainer>
       </S.LoginBox>
     </S.Container>
   );

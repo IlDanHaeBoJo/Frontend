@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import { colors } from "../../styles/colors";
 
 export const Container = styled.div`
   display: flex;
@@ -6,15 +7,14 @@ export const Container = styled.div`
   max-width: fit-content;
   margin: 0 auto;
   padding: 40px;
-  margin: 0 auto;
-  background-color: #fcfcff;
+  background-color: ${colors.whiteBlue};
 `;
 
 export const FormSection = styled.div`
   width: 650px;
   min-width: 520px;
-  background-color: #ffffff;
-  border: 1px solid #e5edff;
+  background-color: ${colors.white};
+  border: 1px solid ${colors.cloudBlue2};
   border-radius: 16px;
   padding: 30px;
 `;
@@ -23,7 +23,7 @@ export const FormTitle = styled.div`
   font-family: "Inter", sans-serif;
   font-weight: 700;
   font-size: 28px;
-  color: #1a1a33;
+  color: ${colors.indigoGray4};
   margin-bottom: 30px;
 `;
 
@@ -36,7 +36,7 @@ export const Label = styled.label`
   font-family: "Inter", sans-serif;
   font-weight: 600;
   font-size: 16px;
-  color: #33334d;
+  color: ${colors.indigoGray3};
   margin-bottom: 10px;
 `;
 
@@ -44,8 +44,8 @@ export const Input = styled.input`
   width: 100%;
   height: 50px;
   padding: 0 15px;
-  background-color: #fcfcff;
-  border: 1px solid #d9e5f2;
+  background-color: ${colors.whiteBlue};
+  border: 1px solid ${colors.cloudBlue3};
   border-radius: 8px;
   font-family: "Inter", sans-serif;
   font-size: 16px;
@@ -56,8 +56,8 @@ export const Select = styled.select`
   width: 180px;
   height: 50px;
   padding: 0 15px;
-  background-color: #fcfcff;
-  border: 1px solid #d9e5f2;
+  background-color: ${colors.whiteBlue};
+  border: 1px solid ${colors.cloudBlue3};
   border-radius: 8px;
   font-family: "Inter", sans-serif;
   font-size: 16px;
@@ -67,8 +67,8 @@ export const Textarea = styled.textarea`
   width: 100%;
   height: 250px;
   padding: 15px;
-  background-color: #fcfcff;
-  border: 1px solid #d9e5f2;
+  background-color: ${colors.whiteBlue};
+  border: 1px solid ${colors.cloudBlue3};
   border-radius: 8px;
   font-family: "Inter", sans-serif;
   font-size: 16px;
@@ -83,18 +83,18 @@ export const FileInput = styled.div`
   width: 100%;
   height: 50px;
   padding: 0 15px;
-  background-color: #fcfcff;
-  border: 1px solid #d9e5f2;
+  background-color: ${colors.whiteBlue};
+  border: 1px solid ${colors.cloudBlue3};
   border-radius: 8px;
   font-family: "Inter", sans-serif;
   font-size: 16px;
-  color: #9999b2;
+  color: ${colors.indigoGray1};
   box-sizing: border-box;
 `;
 
 export const FileButton = styled.button`
-  background-color: #3366cc;
-  color: #ffffff;
+  background-color: ${colors.cloudBlue3};
+  color: ${colors.gray600};
   border: none;
   border-radius: 6px;
   padding: 8px 15px;
@@ -167,7 +167,7 @@ export const ButtonSection = styled.div`
 export const DraftButton = styled.button`
   width: 130px;
   height: 50px;
-  background-color: #f2f2f2;
+  background-color: ${colors.gray100};
   border: 1px solid #d9d9d9;
   border-radius: 8px;
   font-family: "Inter", sans-serif;
@@ -180,20 +180,20 @@ export const DraftButton = styled.button`
 export const PublishButton = styled.button`
   width: 130px;
   height: 50px;
-  background-color: #3366cc;
+  background-color: ${colors.blue};
   border: none;
   border-radius: 8px;
   font-family: "Inter", sans-serif;
   font-weight: 700;
   font-size: 16px;
-  color: #ffffff;
+  color: ${colors.white};
   cursor: pointer;
 `;
 
 export const CancelButton = styled.button`
   width: 130px;
   height: 50px;
-  background-color: #f2f2f2;
+  background-color: ${colors.gray100};
   border: 1px solid #d9d9d9;
   border-radius: 8px;
   font-family: "Inter", sans-serif;
@@ -205,8 +205,8 @@ export const CancelButton = styled.button`
 
 export const ListSection = styled.div`
   width: 640px;
-  background-color: #ffffff;
-  border: 1px solid #e5edff;
+  background-color: ${colors.white};
+  border: 1px solid ${colors.cloudBlue2};
   border-radius: 16px;
   padding: 30px;
 `;
@@ -215,13 +215,13 @@ export const ListTitle = styled.div`
   font-family: "Inter", sans-serif;
   font-weight: 700;
   font-size: 24px;
-  color: #1a1a33;
+  color: ${colors.indigoGray4};
   margin-bottom: 30px;
 `;
 
 export const NoticeCard = styled.div`
-  background-color: #fcfcff;
-  border: 1px solid #e5edff;
+  background-color: ${colors.whiteBlue};
+  border: 1px solid ${colors.cloudBlue2};
   border-radius: 12px;
   padding: 20px;
   margin-bottom: 20px;
@@ -234,13 +234,13 @@ export const NoticeTitle = styled.h3`
   font-family: "Inter", sans-serif;
   font-weight: 600;
   font-size: 17px;
-  color: #1a1a33;
+  color: ${colors.indigoGray4};
   margin: 0 0 10px 0;
 `;
 
 export const ImportantBadge = styled.span`
-  background-color: #e53333;
-  color: #ffffff;
+  background-color: ${colors.red};
+  color: ${colors.white};
   padding: 3px 8px;
   border-radius: 12px;
   font-size: 11px;
@@ -253,13 +253,13 @@ export const NoticeInfo = styled.div`
   gap: 10px;
   font-family: "Inter", sans-serif;
   font-size: 13px;
-  color: #808099;
+  color: ${colors.indigoGray2};
   margin-bottom: 15px;
 `;
 
 export const StatusBadge = styled.span`
-  background-color: #29a645;
-  color: #ffffff;
+  background-color: ${colors.green};
+  color: ${colors.white};
   padding: 3px 8px;
   border-radius: 10px;
   font-size: 10px;
@@ -273,8 +273,8 @@ export const ActionButtons = styled.div`
 `;
 
 export const EditButton = styled.button`
-  background-color: #3366cc;
-  color: #ffffff;
+  background-color: ${colors.blue};
+  color: ${colors.white};
   border: none;
   border-radius: 5px;
   padding: 5px 10px;
@@ -285,8 +285,8 @@ export const EditButton = styled.button`
 `;
 
 export const DeleteButton = styled.button`
-  background-color: #e53333;
-  color: #ffffff;
+  background-color: ${colors.red};
+  color: ${colors.white};
   border: none;
   border-radius: 5px;
   padding: 5px 10px;

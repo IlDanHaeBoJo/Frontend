@@ -1,17 +1,18 @@
 import styled from "styled-components";
+import { colors } from "../../styles/colors";
 
 export const Container = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
   height: calc(100vh - 90px);
-  background-color: #f0f2f5;
+  background-color: ${colors.lavenderBlue1};
 `;
 
 export const LoginBox = styled.div`
   width: 500px;
   padding: 40px;
-  background-color: #ffffff;
+  background-color: ${colors.white};
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   display: flex;
@@ -23,7 +24,7 @@ export const Title = styled.h2`
   font-family: "Inter", sans-serif;
   font-weight: 700;
   font-size: 28px;
-  color: #000000;
+  color: ${colors.black};
   margin-bottom: 40px;
 `;
 
@@ -31,8 +32,8 @@ export const Input = styled.input`
   width: 380px;
   height: 50px;
   padding: 0 20px;
-  background-color: #ffffff;
-  border: 1px solid #b2b2b2;
+  background-color: ${colors.white};
+  border: 1px solid ${colors.gray400};
   border-radius: 4px;
   margin-bottom: 20px;
   font-family: "Inter", sans-serif;
@@ -40,29 +41,34 @@ export const Input = styled.input`
   box-sizing: border-box;
 
   &::placeholder {
-    color: #808080;
+    color: ${colors.gray500};
   }
 `;
 
 export const LoginButton = styled.button`
   width: 380px;
   height: 60px;
-  background-color: #3366cc;
+  background-color: ${colors.blue};
   border: none;
   border-radius: 4px;
   font-family: "Inter", sans-serif;
-  font-weight: 700;
-  font-size: 20px;
-  color: #ffffff;
+  font-weight: 600;
+  font-size: 18px;
+  color: ${colors.white};
   cursor: pointer;
 
   &:hover {
     text-decoration: underline;
   }
+
+  &:disabled {
+    background-color: ${colors.gray500};
+    cursor: not-allowed;
+  }
 `;
 
 export const ErrorMsg = styled.p`
-  color: red;
+  color: ${colors.red};
   font-size: 12px;
   margin-top: -15px;
   margin-bottom: 10px;
@@ -72,7 +78,35 @@ export const ErrorMsg = styled.p`
 
 export const RegisterText = styled.p`
   margin-top: 20px;
-  color: #666666;
+  color: ${colors.gray600};
   cursor: pointer;
   text-decoration: underline;
+`;
+
+export const RegisterContainer = styled.div`
+  display: flex;
+  gap: 20px;
+`;
+
+export const ModalOverlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
+export const ModalContent = styled.div`
+  width: 400px;
+  padding: 50px;
+  background-color: ${colors.white};
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 `;

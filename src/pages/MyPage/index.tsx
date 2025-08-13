@@ -1,9 +1,32 @@
-import React from "react";
+import React, { useState } from "react";
 import * as S from "./style";
 import { useUser } from "../../store/UserContext";
+import { changePassword } from "../../apis/user";
 
 const MyPage = () => {
   const { user } = useUser();
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
+  const handlePasswordChange = async () => {
+    if (newPassword !== confirmPassword) {
+      alert("새 비밀번호가 일치하지 않습니다.");
+      return;
+    }
+    try {
+      await changePassword({
+        current_password: currentPassword,
+        new_password: newPassword,
+      });
+      alert("비밀번호가 성공적으로 변경되었습니다.");
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+    } catch (error) {
+      alert("비밀번호 변경에 실패했습니다.");
+    }
+  };
 
   if (!user) {
     return (
@@ -68,12 +91,24 @@ const MyPage = () => {
         <S.InfoCard>
           <S.CardTitle>비밀번호 변경</S.CardTitle>
           <S.InputLabel>현재 비밀번호</S.InputLabel>
-          <S.Input type="password" />
+          <S.Input
+            type="password"
+            value={currentPassword}
+            onChange={(e) => setCurrentPassword(e.target.value)}
+          />
           <S.InputLabel>새 비밀번호</S.InputLabel>
-          <S.Input type="password" />
+          <S.Input
+            type="password"
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
+          />
           <S.InputLabel>비밀번호 확인</S.InputLabel>
-          <S.Input type="password" />
-          <S.Button>변경사항 저장</S.Button>
+          <S.Input
+            type="password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+          />
+          <S.Button onClick={handlePasswordChange}>변경사항 저장</S.Button>
         </S.InfoCard>
       </S.InfoSection>
     </S.Container>

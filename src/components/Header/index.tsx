@@ -66,7 +66,7 @@ const Header = () => {
               onClick={() => navigate("/evaluation")}
               isAdmin={isAdmin}
             >
-              사용자 관리
+              학생 관리
             </S.MenuButton>
             <S.MenuButton
               isActive={location.pathname === "/notice-manage"}
@@ -79,13 +79,16 @@ const Header = () => {
         ) : (
           <>
             <S.MenuButton
-              isActive={location.pathname === "/practice"}
+              isActive={
+                location.pathname === "/practice" ||
+                location.pathname === "/practice-progress"
+              }
               onClick={() => navigate("/practice")}
             >
               실습
             </S.MenuButton>
             <S.MenuButton
-              isActive={location.pathname === "/result"}
+              isActive={location.pathname.startsWith("/result")}
               onClick={() => navigate("/result")}
             >
               기록
