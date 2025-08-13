@@ -8,7 +8,17 @@ export interface User {
   major?: string;
 }
 
-export interface ChangePasswordRequest {
+export interface ChangePassword {
   current_password: string;
   new_password: string;
+}
+
+export interface RequestPasswordReset {
+  username: string;
+  email: string;
+}
+
+export interface VerifyPasswordResetCode {
+  email: string;
+  code: string;
 }
