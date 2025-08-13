@@ -28,11 +28,11 @@ export const updateNotice = async (
     important: boolean;
   }
 ) => {
-  const response = await api.put(`/admin/notices/${id}/`, data);
+  const response = await api.put(`/admin/notices/${id}`, data);
   return response.data;
 };
 
 export const deleteNotice = async (id: number) => {
-  const response = await api.delete(`/admin/notices/${id}/`);
+  const response = await api.delete(`/admin/notices/${id}`);
   return response.data;
 };

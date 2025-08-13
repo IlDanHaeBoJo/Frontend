@@ -7,6 +7,12 @@ export interface GetNotice {
   view_count: number;
   created_at: string;
   updated_at: string;
+  attachments?: Array<{
+    id: number;
+    original_filename: string;
+    file_size: number;
+    file_type: string;
+  }>;
 }
 
 export const dummyNotices: GetNotice[] = [

@@ -19,17 +19,22 @@ export interface S3Config {
 
 // Presigned URL 관련 타입들
 export interface PresignedUrlRequest {
-  fileName: string;
-  fileType: string;
-  fileSize: number;
+  filename: string;
+  content_type: string;
+  content_length: number;
   folder?: string;
 }
 
 export interface PresignedUrlResponse {
-  presignedUrl: string;
-  key: string;
-  bucket: string;
+  presignedUrl?: string;
+  presigned_url?: string;
+  upload_url?: string;
+  url?: string;
+  key?: string;
+  stored_filename?: string;
+  bucket?: string;
   fields?: Record<string, string>; // POST 방식일 때 사용
+  file_type?: string; // Backend API spec
 }
 
 export interface FileUploadResult {
@@ -47,12 +52,38 @@ export interface FileInfo {
   url: string;
   key: string;
   bucket: string;
-  fileName: string;
-  fileType: string;
-  fileSize: number;
+  original_filename: string;
+  file_type: string;
+  file_size: number;
   description?: string;
-  createdAt: string;
-  updatedAt: string;
+  created_at: string;
+  updated_at: string;
+}
+
+// 공지사항별 첨부파일 관련 타입들
+export interface AttachmentUploadRequest {
+  filename: string;
+  content_type: string;
+  content_length: number;
+}
+
+export interface AttachmentUploadCompleteRequest {
+  key: string;
+  filename: string;
+  content_type: string;
+  content_length: number;
+}
+
+export interface AttachmentInfo {
+  id: number;
+  original_filename: string;
+  file_type: string;
+  file_size: number;
+  url: string;
+  key: string;
+  bucket: string;
+  created_at: string;
+  updated_at: string;
 }
 
 

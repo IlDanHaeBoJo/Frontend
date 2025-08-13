@@ -1,183 +1,252 @@
-import React, { useState, useCallback } from 'react';
-import { useDropzone } from 'react-dropzone';
+import React, { useState, useRef } from 'react';
+import { uploadToS3 } from '../../apis/file';
 import { 
-  uploadFileWithPresignedUrl, 
-  uploadMultipleFilesWithPresignedUrl,
-  uploadFileWithProgress,
-  validateFileSize,
-  validateFileType 
-} from '../../utils/s3Upload';
-import { FileUploadData, FileUploadResult } from '../../types/s3';
+  getPresignedUrl, 
+  uploadComplete, 
+  getAttachmentList, 
+  downloadAttachment,
+  deleteAttachment 
+} from '../../apis/attachment';
+import { FileInfo } from '../../types/s3';
 import './styles.css';
 
 interface FileUploadProps {
-  onUploadSuccess?: (result: FileUploadResult | FileUploadResult[]) => void;
-  onUploadError?: (error: Error) => void;
-  multiple?: boolean;
-  maxSize?: number; // MB
-  allowedTypes?: string[];
-  folder?: string;
-  description?: string;
-  showProgress?: boolean;
+  noticeId: number;
+  onUploadComplete?: () => void;
 }
 
-const FileUpload: React.FC<FileUploadProps> = ({
-  onUploadSuccess,
-  onUploadError,
-  multiple = false,
-  maxSize = 10,
-  allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'application/pdf'],
-  folder = 'uploads',
-  description,
-  showProgress = true
-}) => {
+const FileUpload: React.FC<FileUploadProps> = ({ noticeId, onUploadComplete }) => {
+  const [files, setFiles] = useState<File[]>([]);
+  const [attachments, setAttachments] = useState<FileInfo[]>([]);
   const [uploading, setUploading] = useState(false);
-  const [progress, setProgress] = useState(0);
-  const [uploadedFiles, setUploadedFiles] = useState<FileUploadResult[]>([]);
+  const [uploadProgress, setUploadProgress] = useState<{ [key: string]: number }>({});
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const onDrop = useCallback(async (acceptedFiles: File[]) => {
+  // 첨부파일 목록 로드
+  const loadAttachments = async () => {
+    try {
+      const attachmentList = await getAttachmentList({ noticeId });
+      setAttachments(attachmentList);
+    } catch (error) {
+      console.error('첨부파일 목록 로드 실패:', error);
+    }
+  };
+
+  // 컴포넌트 마운트 시 첨부파일 목록 로드
+  React.useEffect(() => {
+    loadAttachments();
+  }, [noticeId]);
+
+  // 파일 선택 핸들러
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFiles = Array.from(event.target.files || []);
+    setFiles(selectedFiles);
+  };
+
+  // 파일 업로드 핸들러
+  const handleUpload = async () => {
+    if (files.length === 0) return;
+
     setUploading(true);
-    setProgress(0);
+    setUploadProgress({});
 
     try {
-      // 파일 검증
-      const invalidFiles = acceptedFiles.filter(file => {
-        if (!validateFileSize(file, maxSize)) {
-          throw new Error(`${file.name}: 파일 크기가 ${maxSize}MB를 초과합니다.`);
-        }
-        if (!validateFileType(file, allowedTypes)) {
-          throw new Error(`${file.name}: 지원하지 않는 파일 형식입니다.`);
-        }
-        return false;
-      });
+      for (const file of files) {
+        // 1. Presigned URL 발급 요청
+        const presignedResponse = await getPresignedUrl({
+          noticeId,
+          request: {
+            filename: file.name,
+            content_type: file.type,
+            content_length: file.size,
+          }
+        });
 
-      if (invalidFiles.length > 0) {
-        throw new Error('일부 파일이 검증을 통과하지 못했습니다.');
+        // 2. S3에 직접 PUT 업로드
+        setUploadProgress(prev => ({ ...prev, [file.name]: 50 }));
+        
+        // presigned URL을 유연하게 처리
+        const uploadUrl = presignedResponse.presignedUrl || 
+                         presignedResponse.presigned_url || 
+                         presignedResponse.upload_url || 
+                         presignedResponse.url;
+        
+        if (!uploadUrl) {
+          throw new Error('Presigned URL not found in response');
+        }
+        
+        console.log('Presigned URL response:', presignedResponse);
+        console.log('Using upload URL:', uploadUrl);
+        
+        await uploadToS3(uploadUrl, file);
+        
+        setUploadProgress(prev => ({ ...prev, [file.name]: 75 }));
+
+                 // 3. 업로드 완료 콜백
+         await uploadComplete({
+           noticeId,
+           fileData: {
+             key: presignedResponse.stored_filename || presignedResponse.key || '',
+             filename: file.name,
+             content_type: file.type,
+             content_length: file.size,
+           }
+         });
+
+        setUploadProgress(prev => ({ ...prev, [file.name]: 100 }));
       }
 
-      const fileDataArray: FileUploadData[] = acceptedFiles.map(file => ({
-        file,
-        fileName: file.name,
-        folder
-      }));
-
-      let results: FileUploadResult[];
-
-      if (multiple) {
-        // 여러 파일 업로드
-        results = await uploadMultipleFilesWithPresignedUrl(fileDataArray, description);
-      } else {
-        // 단일 파일 업로드 (진행률 추적 포함)
-        if (showProgress) {
-          const result = await uploadFileWithProgress(
-            fileDataArray[0], 
-            (progressValue) => setProgress(progressValue),
-            description
-          );
-          results = [result];
-        } else {
-          const result = await uploadFileWithPresignedUrl(fileDataArray[0], description);
-          results = [result];
-        }
-      }
-
-      setUploadedFiles(prev => [...prev, ...results]);
+      // 4. 목록 새로고침
+      await loadAttachments();
       
-      if (onUploadSuccess) {
-        onUploadSuccess(multiple ? results : results[0]);
+      // 파일 선택 초기화
+      setFiles([]);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+
+      // 콜백 호출
+      if (onUploadComplete) {
+        onUploadComplete();
       }
 
     } catch (error) {
       console.error('파일 업로드 실패:', error);
-      if (onUploadError) {
-        onUploadError(error as Error);
-      }
+      alert('파일 업로드에 실패했습니다.');
     } finally {
       setUploading(false);
-      setProgress(0);
+      setUploadProgress({});
     }
-  }, [multiple, maxSize, allowedTypes, folder, description, showProgress, onUploadSuccess, onUploadError]);
+  };
 
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    onDrop,
-    multiple,
-    accept: allowedTypes.reduce((acc, type) => {
-      acc[type] = [];
-      return acc;
-    }, {} as Record<string, string[]>)
-  });
+  // 파일 다운로드 핸들러
+  const handleDownload = async (attachment: FileInfo) => {
+    try {
+      const blob = await downloadAttachment({ attachmentId: attachment.id });
+      
+      // 다운로드 링크 생성
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = attachment.original_filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('파일 다운로드 실패:', error);
+      alert('파일 다운로드에 실패했습니다.');
+    }
+  };
 
-  const removeFile = (index: number) => {
-    setUploadedFiles(prev => prev.filter((_, i) => i !== index));
+  // 파일 삭제 핸들러
+  const handleDelete = async (attachment: FileInfo) => {
+    if (!window.confirm('정말로 이 파일을 삭제하시겠습니까?')) return;
+
+    try {
+      await deleteAttachment({ attachmentId: attachment.id });
+      await loadAttachments(); // 목록 새로고침
+    } catch (error) {
+      console.error('파일 삭제 실패:', error);
+      alert('파일 삭제에 실패했습니다.');
+    }
+  };
+
+  // 파일 크기 포맷팅
+  const formatFileSize = (bytes: number): string => {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
 
   return (
     <div className="file-upload-container">
-      <div
-        {...getRootProps()}
-        className={`dropzone ${isDragActive ? 'active' : ''} ${uploading ? 'uploading' : ''}`}
-      >
-        <input {...getInputProps()} />
-        {uploading ? (
-          <div className="upload-progress">
-            <div className="progress-text">업로드 중...</div>
-            {showProgress && (
-              <div className="progress-bar">
-                <div 
-                  className="progress-fill" 
-                  style={{ width: `${progress}%` }}
-                />
-              </div>
-            )}
-            <div className="progress-percentage">{Math.round(progress)}%</div>
-          </div>
-        ) : (
-          <div className="dropzone-content">
-            <div className="upload-icon">📁</div>
-            <p className="upload-text">
-              {isDragActive
-                ? '파일을 여기에 놓으세요'
-                : '클릭하거나 파일을 드래그하여 업로드하세요'
-              }
-            </p>
-            <p className="upload-hint">
-              최대 {maxSize}MB, 지원 형식: {allowedTypes.join(', ')}
-            </p>
+      {/* 파일 선택 UI */}
+      <div className="file-select-section">
+        <h3>첨부파일 업로드</h3>
+        <div className="file-input-wrapper">
+          <input
+            ref={fileInputRef}
+            type="file"
+            multiple
+            onChange={handleFileSelect}
+            disabled={uploading}
+            className="file-input"
+          />
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            disabled={uploading}
+            className="file-select-btn"
+          >
+            파일 선택
+          </button>
+        </div>
+
+        {/* 선택된 파일 목록 */}
+        {files.length > 0 && (
+          <div className="selected-files">
+            <h4>선택된 파일:</h4>
+            <ul>
+              {files.map((file, index) => (
+                <li key={index}>
+                  {file.name} ({formatFileSize(file.size)})
+                  {uploadProgress[file.name] && (
+                    <div className="progress-bar">
+                      <div 
+                        className="progress-fill" 
+                        style={{ width: `${uploadProgress[file.name]}%` }}
+                      />
+                    </div>
+                  )}
+                </li>
+              ))}
+            </ul>
+            <button
+              onClick={handleUpload}
+              disabled={uploading}
+              className="upload-btn"
+            >
+              {uploading ? '업로드 중...' : '업로드'}
+            </button>
           </div>
         )}
       </div>
 
-      {uploadedFiles.length > 0 && (
-        <div className="uploaded-files">
-          <h4>업로드된 파일:</h4>
-          {uploadedFiles.map((file, index) => (
-            <div key={index} className="uploaded-file">
-              <div className="file-info">
-                <span className="file-name">{file.fileName}</span>
-                <span className="file-size">
-                  ({(file.fileSize / 1024 / 1024).toFixed(2)} MB)
-                </span>
+      {/* 첨부파일 목록 */}
+      <div className="attachments-section">
+        <h3>첨부파일 목록</h3>
+        {attachments?.length === 0 ? (
+          <p className="no-files">첨부된 파일이 없습니다.</p>
+        ) : (
+          <div className="attachments-list">
+            {attachments.map((attachment) => (
+              <div key={attachment.id} className="attachment-item">
+                <div className="attachment-info">
+                  <span className="file-name">{attachment.original_filename}</span>
+                  <span className="file-size">{formatFileSize(attachment.file_size)}</span>
+                  <span className="file-type">{attachment.file_type}</span>
+                </div>
+                <div className="attachment-actions">
+                  <button
+                    onClick={() => handleDownload(attachment)}
+                    className="download-btn"
+                  >
+                    다운로드
+                  </button>
+                  <button
+                    onClick={() => handleDelete(attachment)}
+                    className="delete-btn"
+                  >
+                    삭제
+                  </button>
+                </div>
               </div>
-              <div className="file-actions">
-                <a 
-                  href={file.url} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="view-link"
-                >
-                  보기
-                </a>
-                <button 
-                  onClick={() => removeFile(index)}
-                  className="remove-btn"
-                >
-                  삭제
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 };

@@ -7,13 +7,34 @@ import {
   FileInfo 
 } from "../types/s3";
 
-// 1. Presigned URL 요청 (백엔드에서 S3 SDK로 생성)
-export const getPresignedUrl = async (request: PresignedUrlRequest): Promise<PresignedUrlResponse> => {
-  const response = await api.post("/files/presigned-url/", request);
-  return response.data;
+// S3에 직접 업로드하는 함수 (클라이언트에서 S3로 PUT 요청)
+export const uploadToS3 = async (
+  presignedUrl: string, 
+  file: File
+): Promise<void> => {
+  // upload_url은 쿼리스트링 한 글자도 수정하지 않음
+  // Content-Type을 presign과 동일하게 설정
+  // Authorization 헤더 금지 (URL 자체가 권한)
+  // withCredentials: false 유지 (axios 기본값)
+  
+  if (!presignedUrl) {
+    throw new Error('Presigned URL is undefined');
+  }
+  
+  console.log('Uploading to S3 with URL:', presignedUrl);
+  
+  await fetch(presignedUrl, {
+    method: 'PUT',
+    body: file,
+    headers: {
+      'Content-Type': file.type,
+      // Authorization 헤더는 추가하지 않음
+    },
+    // withCredentials는 fetch의 기본값이 false이므로 별도 설정 불필요
+  });
 };
 
-// 2. 파일 정보를 백엔드에 저장 (업로드 완료 후)
+// 기존 파일 관리 함수들 (필요시 사용)
 export const saveFileInfo = async (fileData: {
   url: string;
   key: string;
@@ -27,7 +48,6 @@ export const saveFileInfo = async (fileData: {
   return response.data;
 };
 
-// 여러 파일 정보를 백엔드에 저장
 export const saveMultipleFileInfo = async (files: {
   url: string;
   key: string;
@@ -41,7 +61,6 @@ export const saveMultipleFileInfo = async (files: {
   return response.data;
 };
 
-// 파일 목록 조회
 export const getFileList = async (params?: {
   page?: number;
   limit?: number;
@@ -56,13 +75,11 @@ export const getFileList = async (params?: {
   return response.data;
 };
 
-// 파일 삭제
 export const deleteFile = async (fileId: number): Promise<void> => {
   const response = await api.delete(`/files/${fileId}/`);
   return response.data;
 };
 
-// 파일 정보 업데이트
 export const updateFileInfo = async (
   fileId: number,
   data: {
@@ -74,7 +91,6 @@ export const updateFileInfo = async (
   return response.data;
 };
 
-// 파일 상세 정보 조회
 export const getFileInfo = async (fileId: number): Promise<FileInfo> => {
   const response = await api.get(`/files/${fileId}/`);
   return response.data;

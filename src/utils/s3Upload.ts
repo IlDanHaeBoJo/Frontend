@@ -4,7 +4,8 @@ import {
   FileUploadResult, 
   FileUploadData 
 } from '../types/s3';
-import { getPresignedUrl, saveFileInfo } from '../apis/file';
+import { getPresignedUrl } from '../apis/attachment';
+import { saveFileInfo } from '../apis/file';
 
 /**
  * Presigned URL을 사용하여 파일을 S3에 업로드
@@ -17,13 +18,13 @@ export const uploadFileWithPresignedUrl = async (
   
   // 1. 백엔드에 presigned URL 요청
   const presignedRequest: PresignedUrlRequest = {
-    fileName: fileName || file.name,
-    fileType: file.type,
-    fileSize: file.size,
+    filename: fileName || file.name,
+    content_type: file.type,
+    content_length: file.size,
     folder
   };
 
-  const presignedResponse: PresignedUrlResponse = await getPresignedUrl(presignedRequest);
+  const presignedResponse: PresignedUrlResponse = await getPresignedUrl({ noticeId: 1, request: presignedRequest });
 
   // 2. Presigned URL로 S3에 직접 업로드
   const uploadResult = await uploadToS3WithPresignedUrl(file, presignedResponse);
@@ -43,9 +44,9 @@ export const uploadFileWithPresignedUrl = async (
     url: fileInfo.url,
     key: fileInfo.key,
     bucket: fileInfo.bucket,
-    fileName: fileInfo.fileName,
-    fileType: fileInfo.fileType,
-    fileSize: fileInfo.fileSize,
+    fileName: fileInfo.original_filename,
+    fileType: fileInfo.file_type,
+    fileSize: fileInfo.file_size,
     description: fileInfo.description
   };
 };
@@ -58,7 +59,17 @@ const uploadToS3WithPresignedUrl = async (
   presignedResponse: PresignedUrlResponse
 ): Promise<{ url: string; key: string; bucket: string }> => {
   try {
-    const response = await fetch(presignedResponse.presignedUrl, {
+    // presigned URL을 유연하게 처리
+    const uploadUrl = presignedResponse.presignedUrl || 
+                     presignedResponse.presigned_url || 
+                     presignedResponse.upload_url || 
+                     presignedResponse.url;
+    
+    if (!uploadUrl) {
+      throw new Error('Presigned URL not found in response');
+    }
+    
+    const response = await fetch(uploadUrl, {
       method: 'PUT',
       body: file,
       headers: {
@@ -71,12 +82,12 @@ const uploadToS3WithPresignedUrl = async (
     }
 
     // S3 URL 생성 (presigned URL에서 추출)
-    const url = presignedResponse.presignedUrl.split('?')[0];
+    const url = uploadUrl.split('?')[0];
     
     return {
       url,
-      key: presignedResponse.key,
-      bucket: presignedResponse.bucket,
+      key: presignedResponse.stored_filename || presignedResponse.key || '',
+      bucket: presignedResponse.bucket || '',
     };
   } catch (error) {
     console.error('S3 업로드 실패:', error);
@@ -92,6 +103,16 @@ const uploadToS3WithPresignedPost = async (
   presignedResponse: PresignedUrlResponse
 ): Promise<{ url: string; key: string; bucket: string }> => {
   try {
+    // presigned URL을 유연하게 처리
+    const uploadUrl = presignedResponse.presignedUrl || 
+                     presignedResponse.presigned_url || 
+                     presignedResponse.upload_url || 
+                     presignedResponse.url;
+    
+    if (!uploadUrl) {
+      throw new Error('Presigned URL not found in response');
+    }
+    
     const formData = new FormData();
     
     // presigned POST의 fields를 FormData에 추가
@@ -104,7 +125,7 @@ const uploadToS3WithPresignedPost = async (
     // 파일 추가
     formData.append('file', file);
 
-    const response = await fetch(presignedResponse.presignedUrl, {
+    const response = await fetch(uploadUrl, {
       method: 'POST',
       body: formData,
     });
@@ -114,12 +135,12 @@ const uploadToS3WithPresignedPost = async (
     }
 
     // S3 URL 생성
-    const url = `${presignedResponse.presignedUrl}/${presignedResponse.key}`;
+    const url = `${uploadUrl}/${presignedResponse.stored_filename || presignedResponse.key || ''}`;
     
     return {
       url,
-      key: presignedResponse.key,
-      bucket: presignedResponse.bucket,
+      key: presignedResponse.stored_filename || presignedResponse.key || '',
+      bucket: presignedResponse.bucket || '',
     };
   } catch (error) {
     console.error('S3 업로드 실패:', error);
@@ -170,13 +191,13 @@ export const uploadFileWithProgress = async (
   
   // 1. Presigned URL 요청
   const presignedRequest: PresignedUrlRequest = {
-    fileName: fileName || file.name,
-    fileType: file.type,
-    fileSize: file.size,
+    filename: fileName || file.name,
+    content_type: file.type,
+    content_length: file.size,
     folder
   };
 
-  const presignedResponse: PresignedUrlResponse = await getPresignedUrl(presignedRequest);
+  const presignedResponse: PresignedUrlResponse = await getPresignedUrl({ noticeId: 1, request: presignedRequest });
 
   // 2. 진행률 추적과 함께 업로드
   const uploadResult = await uploadToS3WithProgress(file, presignedResponse, onProgress);
@@ -196,9 +217,9 @@ export const uploadFileWithProgress = async (
     url: fileInfo.url,
     key: fileInfo.key,
     bucket: fileInfo.bucket,
-    fileName: fileInfo.fileName,
-    fileType: fileInfo.fileType,
-    fileSize: fileInfo.fileSize,
+    fileName: fileInfo.original_filename,
+    fileType: fileInfo.file_type,
+    fileSize: fileInfo.file_size,
     description: fileInfo.description
   };
 };
@@ -223,11 +244,22 @@ const uploadToS3WithProgress = async (
 
     xhr.addEventListener('load', () => {
       if (xhr.status === 200) {
-        const url = presignedResponse.presignedUrl.split('?')[0];
+        // presigned URL을 유연하게 처리
+        const uploadUrl = presignedResponse.presignedUrl || 
+                         presignedResponse.presigned_url || 
+                         presignedResponse.upload_url || 
+                         presignedResponse.url;
+        
+        if (!uploadUrl) {
+          reject(new Error('Presigned URL not found in response'));
+          return;
+        }
+        
+        const url = uploadUrl.split('?')[0];
         resolve({
           url,
-          key: presignedResponse.key,
-          bucket: presignedResponse.bucket,
+          key: presignedResponse.stored_filename || presignedResponse.key || '',
+          bucket: presignedResponse.bucket || '',
         });
       } else {
         reject(new Error(`Upload failed: ${xhr.status} ${xhr.statusText}`));
@@ -238,7 +270,18 @@ const uploadToS3WithProgress = async (
       reject(new Error('Upload failed'));
     });
 
-    xhr.open('PUT', presignedResponse.presignedUrl);
+    // presigned URL을 유연하게 처리
+    const uploadUrl = presignedResponse.presignedUrl || 
+                     presignedResponse.presigned_url || 
+                     presignedResponse.upload_url || 
+                     presignedResponse.url;
+    
+    if (!uploadUrl) {
+      reject(new Error('Presigned URL not found in response'));
+      return;
+    }
+    
+    xhr.open('PUT', uploadUrl);
     xhr.setRequestHeader('Content-Type', file.type);
     xhr.send(file);
   });
