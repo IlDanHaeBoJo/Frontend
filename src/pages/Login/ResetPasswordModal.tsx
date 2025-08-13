@@ -35,7 +35,7 @@ const ResetPasswordModal: React.FC<Props> = ({ onClose }) => {
   return (
     <S.ModalOverlay onClick={onClose}>
       <S.ModalContent onClick={(e: React.MouseEvent) => e.stopPropagation()}>
-        <S.Title>비밀번호 재설정</S.Title>
+        <S.Title>비밀번호 찾기</S.Title>
         <S.Input
           type="text"
           placeholder="아이디"

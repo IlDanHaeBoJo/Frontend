@@ -78,7 +78,7 @@ const Login = () => {
             회원가입
           </S.RegisterText>
           <S.RegisterText onClick={handleFindPasswordClick}>
-            비밀번호 재설정
+            비밀번호 찾기
           </S.RegisterText>
         </S.RegisterContainer>
       </S.LoginBox>
