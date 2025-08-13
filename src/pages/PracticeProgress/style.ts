@@ -4,6 +4,7 @@ import { colors } from "../../styles/colors";
 export const Container = styled.div`
   padding: 20px;
   background-color: ${colors.white};
+  min-height: calc(100vh - 250px);
 `;
 
 export const ControlSection = styled.div`
@@ -21,7 +22,7 @@ export const Timer = styled.div`
   color: ${colors.gray700};
 `;
 
-export const Button = styled.button`
+export const Button = styled.button<{ active?: boolean }>`
   width: 140px;
   height: 50px;
   border: none;
@@ -31,7 +32,7 @@ export const Button = styled.button`
   font-size: 16px;
   color: ${colors.white};
   cursor: pointer;
-  background-color: ${colors.blue};
+  background-color: ${(props) => (props.active ? colors.red : colors.blue)};
 
   &:disabled {
     background-color: #a69e96;
