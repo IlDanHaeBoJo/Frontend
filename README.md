@@ -35,4 +35,10 @@ See the section about [deployment](https://facebook.github.io/create-react-app/d
 ## .env 파일 내용
 
 REACT_APP_API_URL={http://백엔드 서버 주소} \
-REACT_APP_WEBSOCKET_URL={ws://백엔드 서버 주소}
+REACT_APP_WEBSOCKET_URL={ws://백엔드 서버 주소} \
+
+### 마이크 인식률 높이기...?
+
+\Backend\routes\websocket.py 485줄 \
+`session["max_silence_duration"] = 1.0  # 일반 발화` \
+`session["max_silence_duration"] = 10.0  # 일반 발화` 으로 변경해보기

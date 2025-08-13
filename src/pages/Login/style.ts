@@ -52,13 +52,18 @@ export const LoginButton = styled.button`
   border: none;
   border-radius: 4px;
   font-family: "Inter", sans-serif;
-  font-weight: 700;
-  font-size: 20px;
+  font-weight: 600;
+  font-size: 18px;
   color: ${colors.white};
   cursor: pointer;
 
   &:hover {
     text-decoration: underline;
+  }
+
+  &:disabled {
+    background-color: ${colors.gray500};
+    cursor: not-allowed;
   }
 `;
 
@@ -76,4 +81,32 @@ export const RegisterText = styled.p`
   color: ${colors.gray600};
   cursor: pointer;
   text-decoration: underline;
+`;
+
+export const RegisterContainer = styled.div`
+  display: flex;
+  gap: 20px;
+`;
+
+export const ModalOverlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
+export const ModalContent = styled.div`
+  width: 400px;
+  padding: 50px;
+  background-color: ${colors.white};
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 `;
