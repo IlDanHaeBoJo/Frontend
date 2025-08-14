@@ -6,6 +6,7 @@ export const Container = styled.div`
   margin: 0 auto;
   max-width: 1500px;
   background-color: ${colors.white};
+  min-height: calc(100vh - 290px);
 `;
 
 export const Title = styled.h1`

@@ -14,7 +14,7 @@ const PracticeProgress = () => {
   const [statusMessage, setStatusMessage] = useState("대기 중");
   const [patientName, setPatientName] = useState("환자");
   const [conversation, setConversation] = useState<
-    { speaker: "user" | "ai"; text: string }[]
+    { speaker_role: "doctor" | "patient"; text: string }[]
   >([]);
   const navigate = useNavigate();
 
@@ -118,13 +118,13 @@ const PracticeProgress = () => {
         if (message.user_text) {
           setConversation((prev) => [
             ...prev,
-            { speaker: "user", text: message.user_text! },
+            { speaker_role: "doctor", text: message.user_text! },
           ]);
         }
         if (message.ai_text) {
           setConversation((prev) => [
             ...prev,
-            { speaker: "ai", text: message.ai_text! },
+            { speaker_role: "patient", text: message.ai_text! },
           ]);
         }
         if (message.audio_url) {
@@ -310,7 +310,7 @@ const PracticeProgress = () => {
               {conversation.map((entry, index) => (
                 <div key={index}>
                   <strong>
-                    {entry.speaker === "user" ? "나: " : "환자: "}
+                    {entry.speaker_role === "doctor" ? "나: " : "환자: "}
                   </strong>
                   {entry.text}
                 </div>
