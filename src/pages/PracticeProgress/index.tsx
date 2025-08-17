@@ -6,14 +6,15 @@ import { ServerMessage } from "../../types/practice";
 const PracticeProgress = () => {
   // 상태 관리
   const [isConnected, setIsConnected] = useState(false);
-  const [isRecording, setIsRecording] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isPracticeStarted, setIsPracticeStarted] = useState(false);
+  type ActivityStatus = "listening" | "processing" | "talking" | "idle";
+  const [activityStatus, setActivityStatus] = useState<ActivityStatus>("idle");
   const [timer, setTimer] = useState(0);
   const [statusMessage, setStatusMessage] = useState("대기 중");
   const [patientName, setPatientName] = useState("환자");
   const [conversation, setConversation] = useState<
-    { speaker: "user" | "ai"; text: string }[]
+    { speaker_role: "doctor" | "patient"; text: string }[]
   >([]);
   const navigate = useNavigate();
 
@@ -32,6 +33,7 @@ const PracticeProgress = () => {
       return;
     }
 
+    setActivityStatus("talking");
     setIsPlaying(true);
     const audioUrl = audioQueue.current.shift();
 
@@ -47,13 +49,16 @@ const PracticeProgress = () => {
         audioPlayer.current.onended = () => {
           URL.revokeObjectURL(objectUrl);
           setIsPlaying(false);
+          setActivityStatus("listening");
         };
       } catch (error) {
         console.error("Error fetching or playing audio:", error);
         setIsPlaying(false);
+        setActivityStatus("listening");
       }
     } else {
       setIsPlaying(false);
+      setActivityStatus("listening");
     }
   }, [isPlaying]);
 
@@ -83,7 +88,6 @@ const PracticeProgress = () => {
     ws.onclose = () => {
       console.log("WebSocket disconnected");
       setIsConnected(false);
-      setIsRecording(false);
       setStatusMessage("연결이 끊어졌습니다. 다시 시도해주세요.");
     };
 
@@ -100,6 +104,13 @@ const PracticeProgress = () => {
     setStatusMessage(message.message || statusMessage);
 
     switch (message.type) {
+      case "listening":
+      case "no_speech":
+        setActivityStatus("listening");
+        break;
+      case "processing":
+        setActivityStatus("processing");
+        break;
       case "session_started":
         setPatientName(message.scenario_name || "환자");
         break;
@@ -107,23 +118,27 @@ const PracticeProgress = () => {
         if (message.user_text) {
           setConversation((prev) => [
             ...prev,
-            { speaker: "user", text: message.user_text! },
+            { speaker_role: "doctor", text: message.user_text! },
           ]);
         }
         if (message.ai_text) {
           setConversation((prev) => [
             ...prev,
-            { speaker: "ai", text: message.ai_text! },
+            { speaker_role: "patient", text: message.ai_text! },
           ]);
         }
         if (message.audio_url) {
-          setIsRecording(false); // TTS 수신 시 녹음 중단
+          if (audioSource.current && audioWorkletNode.current) {
+            audioSource.current.disconnect(audioWorkletNode.current);
+          }
           audioQueue.current.push(message.audio_url);
           processAudioQueue();
         }
         break;
       case "conversation_ended":
-        setIsRecording(false);
+        if (audioSource.current && audioWorkletNode.current) {
+          audioSource.current.disconnect(audioWorkletNode.current);
+        }
         // 세션 종료 처리
         break;
     }
@@ -175,29 +190,26 @@ const PracticeProgress = () => {
   }, []);
 
   // 실습 시작/종료 핸들러
-  const handleStartPractice = () => {
-    setIsPracticeStarted(true);
-    timerInterval.current = setInterval(() => {
-      setTimer((prev) => prev + 1);
-    }, 1000);
-  };
-
-  const handleToggleRecording = async () => {
-    if (!isConnected) {
-      connectWebSocket();
-      return;
-    }
-
-    if (isPlaying) {
-      setStatusMessage("환자가 말하는 중입니다...");
-      return;
-    }
-
-    if (!isRecording) {
+  const handleTogglePractice = async () => {
+    if (!isPracticeStarted) {
       await initAudio();
-      setIsRecording(true);
+      if (audioSource.current && audioWorkletNode.current) {
+        audioSource.current.connect(audioWorkletNode.current);
+      }
+      setActivityStatus("listening");
+      setIsPracticeStarted(true);
+      timerInterval.current = setInterval(() => {
+        setTimer((prev) => prev + 1);
+      }, 1000);
     } else {
-      setIsRecording(false);
+      if (timerInterval.current) {
+        clearInterval(timerInterval.current);
+      }
+      if (audioSource.current && audioWorkletNode.current) {
+        audioSource.current.disconnect(audioWorkletNode.current);
+      }
+      setActivityStatus("idle");
+      setIsPracticeStarted(false);
     }
   };
 
@@ -205,7 +217,6 @@ const PracticeProgress = () => {
     if (timerInterval.current) {
       clearInterval(timerInterval.current);
     }
-    setIsRecording(false);
     if (websocket.current) {
       websocket.current.close();
     }
@@ -232,12 +243,12 @@ const PracticeProgress = () => {
 
   // 녹음 상태 변경 시 효과
   useEffect(() => {
-    if (isRecording && audioSource.current && audioWorkletNode.current) {
-      audioSource.current.connect(audioWorkletNode.current);
-    } else {
-      audioSource.current?.disconnect();
+    if (!isPlaying && isPracticeStarted) {
+      if (audioSource.current && audioWorkletNode.current) {
+        audioSource.current.connect(audioWorkletNode.current);
+      }
     }
-  }, [isRecording]);
+  }, [isPlaying, isPracticeStarted]);
 
   useEffect(() => {
     if (!isPlaying) {
@@ -257,16 +268,9 @@ const PracticeProgress = () => {
     <S.Container>
       <S.ControlSection>
         <S.Timer>{formatTime(timer)}</S.Timer>
-        <S.Button onClick={handleStartPractice} disabled={isPracticeStarted}>
-          실습 시작
+        <S.Button onClick={handleTogglePractice} active={isPracticeStarted}>
+          {isPracticeStarted ? "실습 중단" : "실습 시작"}
         </S.Button>
-        <S.Button
-          onClick={handleToggleRecording}
-          disabled={!isConnected || !isPracticeStarted}
-        >
-          {isRecording ? "대화 중지" : "대화 시작"}
-        </S.Button>
-        {/* 추후에 tts 출력이 끝나고 바로 마이크 입력을 받게 된다면 '실습 시작' 버튼 하나로 변경될 수 있음. */}
         <S.SubmitButton onClick={handleSubmit}>✅ 제출</S.SubmitButton>
       </S.ControlSection>
       <S.PracticeArea>
@@ -274,17 +278,21 @@ const PracticeProgress = () => {
           <S.PatientAvatar>👨‍💼</S.PatientAvatar>
           <S.PatientName>{patientName}</S.PatientName>
           <S.StatusBadge>
-            {isConnected
-              ? isRecording
-                ? "🟢 대화 중"
-                : "🟡 대기 중"
-              : "🔴 연결 끊김"}
+            {!isConnected
+              ? "🔴 연결 끊김"
+              : !isPracticeStarted
+              ? "🟡 대기 중"
+              : activityStatus === "listening"
+              ? "🟢 듣는 중"
+              : activityStatus === "processing"
+              ? "🔵 분석 중"
+              : "🗣️ 말하는 중"}
           </S.StatusBadge>
         </S.PatientVideoArea>
         <S.InfoPanel>
           <S.MemoCard>
             <S.CardHeader>
-              <span>📝</span>
+              <span>✍️</span>
               <span>메모장</span>
             </S.CardHeader>
             <S.MemoArea
@@ -292,24 +300,17 @@ const PracticeProgress = () => {
               placeholder="이곳에 메모를 작성하세요."
             />
           </S.MemoCard>
-          <S.MemoCard>
-            <S.CardHeader>
-              <span>📜</span>
-              <span>진찰 내역</span>
-            </S.CardHeader>
-            <S.MemoArea height="100px" placeholder="진찰 내역을 입력하세요." />
-          </S.MemoCard>
           {/* 확인용 대화내용 로그 추후에 삭제 */}
           <S.MemoCard>
             <S.CardHeader>
               <span>✍️</span>
-              <span>대화 내용</span>
+              <span>대화 내용 -삭제예정</span>
             </S.CardHeader>
             <S.NotesArea>
               {conversation.map((entry, index) => (
                 <div key={index}>
                   <strong>
-                    {entry.speaker === "user" ? "나: " : "환자: "}
+                    {entry.speaker_role === "doctor" ? "나: " : "환자: "}
                   </strong>
                   {entry.text}
                 </div>

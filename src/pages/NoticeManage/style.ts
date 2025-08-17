@@ -5,6 +5,7 @@ export const Container = styled.div`
   display: flex;
   gap: 40px;
   max-width: fit-content;
+  min-height: calc(100vh - 170px);
   margin: 0 auto;
   padding: 40px;
   background-color: ${colors.whiteBlue};
@@ -209,6 +210,8 @@ export const ListSection = styled.div`
   border: 1px solid ${colors.cloudBlue2};
   border-radius: 16px;
   padding: 30px;
+  height: calc(100vh - 220px);
+  overflow-y: auto;
 `;
 
 export const ListTitle = styled.div`
