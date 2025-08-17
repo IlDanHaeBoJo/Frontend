@@ -151,7 +151,7 @@ export const RemoveFileButton = styled.button`
   padding: 4px;
   border-radius: 4px;
   color: #e53333;
-  
+
   &:hover {
     background-color: #ffe6e6;
   }
@@ -282,6 +282,144 @@ export const EditButton = styled.button`
   font-weight: 600;
   font-size: 11px;
   cursor: pointer;
+`;
+
+export const ReadOnlyInput = styled(Input)`
+  background-color: #f5f5f5;
+  cursor: default;
+`;
+
+export const ReadOnlySelect = styled(Select)`
+  background-color: #f5f5f5;
+  cursor: default;
+`;
+
+export const ReadOnlyTextarea = styled(Textarea)`
+  background-color: #f5f5f5;
+  cursor: default;
+  min-height: 200px;
+`;
+
+export const ProgressBarContainer = styled.div`
+  margin-top: 4px;
+`;
+
+export const ProgressBar = styled.div`
+  width: 100%;
+  height: 4px;
+  background-color: #e0e0e0;
+  border-radius: 2px;
+  margin-bottom: 2px;
+`;
+
+export const Progress = styled.div<{ progress: number }>`
+  width: ${(props) => props.progress}%;
+  height: 100%;
+  background-color: ${(props) =>
+    props.progress === 100 ? colors.green : colors.blue};
+  border-radius: 2px;
+  transition: width 0.3s ease;
+`;
+
+export const ProgressStatus = styled.div<{ progress: number }>`
+  font-size: 11px;
+  color: ${(props) => (props.progress === 100 ? colors.green : colors.blue)};
+  font-weight: bold;
+`;
+
+export const AttachmentListContainer = styled.div`
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+`;
+
+export const AttachmentItem = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background-color: #f8f9ff;
+  border: 1px solid #e5edff;
+  border-radius: 6px;
+`;
+
+export const AttachmentName = styled.span`
+  color: ${colors.blue};
+`;
+
+export const AttachmentSize = styled.span`
+  color: ${colors.gray600};
+  margin-left: 10px;
+`;
+
+export const AttachmentActions = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+`;
+
+export const AttachmentDate = styled.span`
+  color: #888;
+  font-size: 12px;
+`;
+
+export const DownloadButton = styled.button`
+  background: ${colors.green};
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 12px;
+  cursor: pointer;
+`;
+
+export const DeleteAttachmentButton = styled.button`
+  background: ${colors.red};
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 12px;
+  cursor: pointer;
+`;
+
+export const RefreshButton = styled.button`
+  margin-left: 10px;
+  padding: 4px 8px;
+  background: ${colors.green};
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+`;
+
+export const AttachmentInfoBox = styled.div`
+  padding-bottom: 4px;
+  background-color: ${colors.whiteBlue};
+  border-radius: 4px;
+  font-size: 12px;
+`;
+
+export const AttachmentInfoText = styled.span`
+  color: ${colors.gray600};
+  font-weight: bold;
+`;
+
+export const AttachmentLink = styled.a`
+  color: ${colors.blue};
+  text-decoration: none;
+  margin-left: 4px;
+`;
+
+export const NoAttachmentsBox = styled.div`
+  margin-top: 8px;
+  padding: 8px;
+  background-color: #f9f9f9;
+  border-radius: 4px;
+  font-size: 12px;
+  color: #999;
 `;
 
 export const DeleteButton = styled.button`

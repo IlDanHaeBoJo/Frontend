@@ -78,6 +78,23 @@ export const FileName = styled.a`
   text-decoration: none;
 `;
 
+export const FileSize = styled.span`
+  color: ${colors.gray600};
+  font-size: 12px;
+  margin-left: 8px;
+`;
+
+export const DownloadButton = styled.button`
+  background: ${colors.green};
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 4px 11px 6px 8px;
+  font-size: 12px;
+  cursor: pointer;
+  margin-left: 8px;
+`;
+
 export const NoticeList = styled.div`
   width: 490px;
   height: calc(100vh - 220px);
@@ -127,6 +144,17 @@ export const NoticeItemTitle = styled.div`
 `;
 
 export const NoticeItemDate = styled.div`
+  font-size: 14px;
+  color: ${colors.indigoGray2};
+`;
+
+export const NoticeItemInfo = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+export const AttachmentInfo = styled.div`
   font-size: 14px;
   color: ${colors.indigoGray2};
 `;
