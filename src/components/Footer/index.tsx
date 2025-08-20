@@ -1,19 +1,19 @@
 import React from "react";
 import styled from "styled-components";
+import { Link } from "react-router-dom";
 
 const Footer = () => {
   return (
     <FooterContainer>
       <FooterContent>
         <Logo>🏥 MediCPX</Logo>
-        <Copyright>© 2024 MediCPX, Inc.</Copyright>
+        <Copyright>© 2025 MediCPX, Inc.</Copyright>
         <FooterLinks>
-          <FooterLink href="#">Terms</FooterLink>
-          <FooterLink href="#">Privacy</FooterLink>
-          <FooterLink href="#">Security</FooterLink>
-          <FooterLink href="#">Status</FooterLink>
-          <FooterLink href="#">Docs</FooterLink>
-          <FooterLink href="#">Contact</FooterLink>
+          <FooterLink as={Link} to="/privacy">
+            개인정보 처리방침
+          </FooterLink>
+          {/* <FooterLink href="#">Privacy</FooterLink>
+          <FooterLink href="#">Security</FooterLink> */}
         </FooterLinks>
       </FooterContent>
     </FooterContainer>
