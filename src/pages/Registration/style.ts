@@ -5,13 +5,14 @@ export const Container = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  height: calc(100vh - 90px);
+  min-height: calc(100vh - 90px);
   background-color: ${colors.lavenderBlue1};
 `;
 
 export const RegistrationBox = styled.div`
   width: 500px;
   padding: 40px;
+  margin: 30px;
   background-color: ${colors.white};
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -26,6 +27,16 @@ export const Title = styled.h2`
   font-size: 28px;
   color: ${colors.black};
   margin-bottom: 40px;
+`;
+
+export const Label = styled.label`
+  align-self: flex-start;
+  margin-left: 65px;
+  margin-bottom: 5px;
+  font-family: "Inter", sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  color: ${colors.gray700};
 `;
 
 export const Input = styled.input`
@@ -101,6 +112,16 @@ export const ToggleButton = styled.button<{ active: boolean }>`
 export const ErrorMsg = styled.p`
   color: ${colors.red};
   font-size: 12px;
+  margin-top: -15px;
+  margin-bottom: 10px;
+  align-self: flex-start;
+  margin-left: 65px;
+`;
+
+export const PasswordMatchMessage = styled.p<{ isMatch: boolean }>`
+  font-family: "Inter", sans-serif;
+  font-size: 14px;
+  color: ${({ isMatch }) => (isMatch ? colors.blue : colors.red)};
   margin-top: -15px;
   margin-bottom: 10px;
   align-self: flex-start;

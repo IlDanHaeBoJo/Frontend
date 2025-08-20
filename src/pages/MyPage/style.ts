@@ -117,3 +117,10 @@ export const Button = styled.button`
     background-color: ${colors.darkBlue};
   }
 `;
+
+export const PasswordMatchMessage = styled.p<{ isMatch: boolean }>`
+  font-family: "Inter", sans-serif;
+  font-size: 14px;
+  color: ${({ isMatch }) => (isMatch ? colors.blue : colors.red)};
+  margin-top: 10px;
+`;

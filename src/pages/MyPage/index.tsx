@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import * as S from "./style";
 import { useUser } from "../../store/UserContext";
 import { changePassword } from "../../apis/user";
@@ -8,6 +8,19 @@ const MyPage = () => {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+
+  useEffect(() => {
+    if (newPassword && confirmPassword) {
+      if (newPassword !== confirmPassword) {
+        setPasswordError("비밀번호가 일치하지 않습니다.");
+      } else {
+        setPasswordError("비밀번호가 일치합니다.");
+      }
+    } else {
+      setPasswordError("");
+    }
+  }, [newPassword, confirmPassword]);
 
   const handlePasswordChange = async () => {
     if (newPassword !== confirmPassword) {
@@ -108,6 +121,11 @@ const MyPage = () => {
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
           />
+          {passwordError && (
+            <S.PasswordMatchMessage isMatch={newPassword === confirmPassword}>
+              {passwordError}
+            </S.PasswordMatchMessage>
+          )}
           <S.Button onClick={handlePasswordChange}>변경사항 저장</S.Button>
         </S.InfoCard>
       </S.InfoSection>
