@@ -10,9 +10,9 @@ import {
   getPresignedUrl,
   uploadComplete,
   getAttachmentList,
-  downloadAttachment,
   deleteAttachment,
 } from "../../apis/attachment";
+import { api } from "../../apis";
 import { uploadToS3 } from "../../apis/file";
 import { useUser } from "../../store/UserContext";
 import { GetNotice, dummyNotices } from "../../types/notice";
@@ -572,33 +572,34 @@ const NoticeManage = () => {
   const handleDownloadAttachment = async (attachment: FileInfo) => {
     try {
       console.log("Downloading attachment:", attachment);
-      console.log("Attachment ID:", attachment.id);
-      console.log("Attachment ID type:", typeof attachment.id);
-      console.log("Attachment ID value:", attachment.id);
 
-      if (
-        !attachment.id ||
-        attachment.id === undefined ||
-        attachment.id === null
-      ) {
+      if (!attachment.id) {
         console.error("Attachment ID is undefined or null");
-        console.error("Full attachment object:", attachment);
         alert("첨부파일 ID가 없어 다운로드할 수 없습니다.");
         return;
       }
 
-      console.log("Calling downloadAttachment with ID:", attachment.id);
-      const blob = await downloadAttachment({ attachmentId: attachment.id });
+      // download_url을 가져오기 위해 API 호출
+      const response = await api.get(`/attachments/download/${attachment.id}`);
+      const downloadUrl = response.data.download_url;
 
-      // 다운로드 링크 생성
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = attachment.original_filename;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
+      if (downloadUrl) {
+        // download_url의 파일을 Blob으로 가져오기
+        const fileResponse = await fetch(downloadUrl);
+        const blob = await fileResponse.blob();
+
+        // Blob을 사용하여 다운로드 링크 생성
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = attachment.original_filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+      } else {
+        alert("다운로드 URL을 가져오지 못했습니다.");
+      }
     } catch (error) {
       console.error("파일 다운로드 실패:", error);
       console.error("Attachment data:", attachment);
@@ -779,7 +780,7 @@ const NoticeManage = () => {
           )}
           {!viewingNotice && (
             <S.PublishButton onClick={handlePublish}>
-              {editingNotice ? "💾 수정하기" : "📝 공지사항 작성"}
+              {editingNotice ? "💾 수정하기" : "📝 작성하기"}
             </S.PublishButton>
           )}
         </S.ButtonSection>
