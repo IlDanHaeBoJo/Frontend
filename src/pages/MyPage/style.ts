@@ -6,6 +6,7 @@ export const Container = styled.div`
   max-width: 1500px;
   margin: 0 auto;
   background-color: ${colors.white};
+  min-height: calc(100vh - 170px);
 `;
 
 export const ProfileSection = styled.div`
@@ -24,6 +25,10 @@ export const ProfileImage = styled.div`
   height: 120px;
   background-color: ${colors.gray200};
   border-radius: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 60px;
 `;
 
 export const UserName = styled.h1`
@@ -116,4 +121,11 @@ export const Button = styled.button`
   &:hover {
     background-color: ${colors.darkBlue};
   }
+`;
+
+export const PasswordMatchMessage = styled.p<{ isMatch: boolean }>`
+  font-family: "Inter", sans-serif;
+  font-size: 14px;
+  color: ${({ isMatch }) => (isMatch ? colors.blue : colors.red)};
+  margin-top: 10px;
 `;

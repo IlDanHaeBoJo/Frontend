@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import * as S from "./style";
 import { getStudentNotices } from "../../apis/notice";
-import { getAttachmentList, downloadAttachment } from "../../apis/attachment";
+import { getAttachmentList } from "../../apis/attachment";
+import { api } from "../../apis";
 import type { GetNotice } from "../../types/notice";
 import { dummyNotices } from "../../types/notice";
 
@@ -111,7 +112,6 @@ const Notice = () => {
   const handleDownloadAttachment = async (attachment: any) => {
     try {
       console.log("Downloading attachment:", attachment);
-      console.log("Attachment ID:", attachment.id);
 
       if (!attachment.id) {
         console.error("Attachment ID is undefined or null");
@@ -119,18 +119,27 @@ const Notice = () => {
         return;
       }
 
-      console.log("Calling downloadAttachment with ID:", attachment.id);
-      const blob = await downloadAttachment({ attachmentId: attachment.id });
+      // download_url을 가져오기 위해 API 호출
+      const response = await api.get(`/attachments/download/${attachment.id}`);
+      const downloadUrl = response.data.download_url;
 
-      // 다운로드 링크 생성
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = attachment.original_filename;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
+      if (downloadUrl) {
+        // download_url의 파일을 Blob으로 가져오기
+        const fileResponse = await fetch(downloadUrl);
+        const blob = await fileResponse.blob();
+
+        // Blob을 사용하여 다운로드 링크 생성
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = attachment.original_filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+      } else {
+        alert("다운로드 URL을 가져오지 못했습니다.");
+      }
     } catch (error) {
       console.error("파일 다운로드 실패:", error);
       console.error("Attachment data:", attachment);

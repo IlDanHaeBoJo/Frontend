@@ -1,5 +1,10 @@
 import { api } from "./index";
 
+export const getAdminCpxResults = async () => {
+  const response = await api.get("/admin/cpx");
+  return response.data;
+};
+
 export const getMyCpxResults = async () => {
   const response = await api.get("/cpx/me");
   return response.data;

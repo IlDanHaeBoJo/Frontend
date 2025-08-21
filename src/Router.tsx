@@ -12,20 +12,9 @@ import MyPage from "./pages/MyPage";
 import Evaluation from "./pages/Evaluation";
 import NoticeManage from "./pages/NoticeManage";
 import HomePage from "./pages/Home";
-
+import PrivacyPolicy from "./pages/Footer/PrivacyPolicy";
 
 const Router = () => {
-  const handleMeClick = async () => {
-    try {
-      const response = await api.get("/auth/me");
-      console.log("User data:", response.data);
-      alert(`Welcome, ${response.data.username}!`);
-    } catch (error) {
-      console.error("Failed to fetch user data:", error);
-      alert("Failed to fetch user data. Are you logged in?");
-    }
-  };
-
   return (
     <BrowserRouter>
       <Routes>
@@ -41,6 +30,7 @@ const Router = () => {
           <Route path="/mypage" element={<MyPage />} />
           <Route path="/evaluation" element={<Evaluation />} />
           <Route path="/notice-manage" element={<NoticeManage />} />
+          <Route path="/privacy" element={<PrivacyPolicy />} />
         </Route>
       </Routes>
     </BrowserRouter>

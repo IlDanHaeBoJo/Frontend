@@ -36,6 +36,7 @@ const ResultDetailModal: React.FC<ResultDetailModalProps> = ({
         evaluation_status: "피드백 완료",
       });
       alert("피드백이 성공적으로 저장되었습니다.");
+      window.location.reload();
       onClose();
     } catch (error) {
       console.error("Failed to save feedback:", error);
@@ -63,7 +64,44 @@ const ResultDetailModal: React.FC<ResultDetailModalProps> = ({
               <S.Section flex={6}>
                 <S.SectionTitle>대화 내역</S.SectionTitle>
                 <S.ConversationBox>
-                  {resultDetail.cpx_detail.conversation_transcript}
+                  {(() => {
+                    try {
+                      const data =
+                        typeof resultDetail.cpx_detail
+                          .system_evaluation_data === "string"
+                          ? JSON.parse(
+                              resultDetail.cpx_detail.system_evaluation_data
+                            )
+                          : resultDetail.cpx_detail.system_evaluation_data;
+
+                      const transcriptString =
+                        data.langgraph_text_analysis?.evaluation_metadata
+                          ?.conversation_transcript;
+
+                      if (!transcriptString) {
+                        return resultDetail.cpx_detail.conversation_transcript; // Fallback
+                      }
+
+                      const transcript = JSON.parse(transcriptString);
+
+                      return transcript.map((entry: any, index: number) => (
+                        <div key={index}>
+                          <strong
+                            style={{
+                              color:
+                                entry.role === "doctor" ? "#007bff" : "#28a745",
+                            }}
+                          >
+                            {entry.role === "doctor" ? "의사" : "환자"}:
+                          </strong>{" "}
+                          {entry.content}
+                        </div>
+                      ));
+                    } catch (e) {
+                      // Fallback on error
+                      return resultDetail.cpx_detail.conversation_transcript;
+                    }
+                  })()}
                 </S.ConversationBox>
               </S.Section>
               <S.Section flex={4}>
@@ -76,7 +114,66 @@ const ResultDetailModal: React.FC<ResultDetailModalProps> = ({
             <S.FeedbackSection>
               <S.SectionTitle>AI 평가 내역</S.SectionTitle>
               <S.FeedbackContent>
-                {resultDetail.cpx_detail.system_evaluation_data}
+                {(() => {
+                  try {
+                    const data =
+                      typeof resultDetail.cpx_detail.system_evaluation_data ===
+                      "string"
+                        ? JSON.parse(
+                            resultDetail.cpx_detail.system_evaluation_data
+                          )
+                        : resultDetail.cpx_detail.system_evaluation_data;
+
+                    const analysis = data.langgraph_text_analysis || {};
+
+                    return (
+                      <div>
+                        <h4>
+                          종합 점수: {analysis.scores?.total_score || "N/A"} (
+                          {analysis.scores?.grade || "N/A"})
+                        </h4>
+                        <p>
+                          <strong>종합 평가:</strong>{" "}
+                          {analysis.feedback?.overall_feedback || "N/A"}
+                        </p>
+                        <div>
+                          <strong>강점:</strong>
+                          <ul>
+                            {analysis.feedback?.strengths?.map(
+                              (item: string, index: number) => (
+                                <li key={index}>{item}</li>
+                              )
+                            ) || <li>N/A</li>}
+                          </ul>
+                        </div>
+                        <div>
+                          <strong>개선점:</strong>
+                          <ul>
+                            {analysis.feedback?.weaknesses?.map(
+                              (item: string, index: number) => (
+                                <li key={index}>{item}</li>
+                              )
+                            ) || <li>N/A</li>}
+                          </ul>
+                        </div>
+                        <p>
+                          <strong>종합 분석:</strong>{" "}
+                          {analysis.feedback?.comprehensive_analysis || "N/A"}
+                        </p>
+                      </div>
+                    );
+                  } catch (e) {
+                    return (
+                      <pre>
+                        {JSON.stringify(
+                          resultDetail.cpx_detail.system_evaluation_data,
+                          null,
+                          2
+                        )}
+                      </pre>
+                    );
+                  }
+                })()}
               </S.FeedbackContent>
             </S.FeedbackSection>
             <S.ProfessorFeedbackSection>
@@ -90,14 +187,16 @@ const ResultDetailModal: React.FC<ResultDetailModalProps> = ({
                     }
                     placeholder="피드백을 입력하세요..."
                   />
-                  <S.ScoreInput
-                    type="number"
-                    value={score}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                      setScore(parseInt(e.target.value, 10))
-                    }
-                    placeholder="점수 입력"
-                  />
+                  <S.ScoreInputContainer>
+                    <S.ScoreLabel>점수 :</S.ScoreLabel>
+                    <S.ScoreInput
+                      type="number"
+                      value={score}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                        setScore(parseInt(e.target.value, 10))
+                      }
+                    />
+                  </S.ScoreInputContainer>
                 </>
               ) : (
                 <S.FeedbackContent>

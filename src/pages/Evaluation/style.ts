@@ -6,7 +6,7 @@ export const Container = styled.div`
   margin: 0 auto;
   max-width: 1500px;
   background-color: ${colors.white};
-  min-height: calc(100vh - 290px);
+  min-height: calc(100vh - 170px);
 `;
 
 export const Title = styled.h1`
@@ -47,21 +47,16 @@ export const StudentId = styled.p`
 
 export const Stats = styled.div`
   display: flex;
-  gap: 20px;
+  justify-content: space-between;
+  align-items: center;
   background-color: ${colors.whiteBlue};
   padding: 15px;
   border-radius: 8px;
   margin-bottom: 20px;
 `;
 
-export const Stat = styled.div`
-  text-align: center;
-  flex: 1;
-`;
-
 export const StatValue = styled.p`
-  font-family: "Inter", sans-serif;
-  font-weight: 700;
+  font-weight: 600;
   font-size: 24px;
   color: ${colors.blue};
   margin: 0;
@@ -69,9 +64,10 @@ export const StatValue = styled.p`
 
 export const StatLabel = styled.p`
   font-family: "Inter", sans-serif;
-  font-size: 12px;
-  color: ${colors.gray600};
-  margin: 5px 0 0 0;
+  font-size: 16px;
+  color: ${colors.gray700};
+  font-weight: 600;
+  margin: 0;
 `;
 
 export const LastPractice = styled.p`

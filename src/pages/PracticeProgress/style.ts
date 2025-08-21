@@ -67,13 +67,11 @@ export const PatientVideoArea = styled.div`
 export const PatientAvatar = styled.div`
   width: 250px;
   height: 250px;
-  line-height: 250px;
-  text-align: center;
   background-color: #5980b2;
   color: ${colors.white};
   border-radius: 125px;
-  font-size: 100px;
   margin-bottom: 20px;
+  overflow: hidden;
 `;
 
 export const PatientName = styled.div`

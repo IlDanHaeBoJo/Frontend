@@ -1,7 +1,14 @@
 import axios from "axios";
-import { getAccessToken } from "../store/tokenManager";
+import {
+  getAccessToken,
+  getRefreshToken,
+  setAccessToken,
+  setRefreshToken,
+  clearAccessToken,
+  clearRefreshToken,
+} from "../store/tokenManager";
 
-const baseURL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+const baseURL = process.env.REACT_APP_API_URL || "http://localhost:8000";
 
 // Instance for public requests (e.g., login, signup)
 export const publicApi = axios.create({
@@ -19,30 +26,51 @@ api.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
-    console.log('API Request:', config.method?.toUpperCase(), config.url);
-    console.log('Request Headers:', config.headers);
+    console.log("API Request:", config.method?.toUpperCase(), config.url);
+    console.log("Request Headers:", config.headers);
     return config;
   },
   (error) => {
-    console.error('Request Error:', error);
+    console.error("Request Error:", error);
     return Promise.reject(error);
   }
 );
 
 api.interceptors.response.use(
   (response) => {
-    console.log('API Response:', response.status, response.config.url);
+    console.log("API Response:", response.status, response.config.url);
     return response;
   },
-  (error) => {
-    console.error('Response Error:', error);
-    console.error('Error Config:', error.config);
-    console.error('Error Response:', error.response);
+  async (error) => {
+    const originalRequest = error.config;
+    if (error.response.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+      const refreshToken = getRefreshToken();
+      if (refreshToken) {
+        try {
+          const response = await publicApi.post("/auth/refresh_token", {
+            refresh_token: refreshToken,
+          });
+          const { access_token, refresh_token } = response.data;
+          setAccessToken(access_token);
+          setRefreshToken(refresh_token);
+          originalRequest.headers.Authorization = `Bearer ${access_token}`;
+          return api(originalRequest);
+        } catch (refreshError) {
+          console.error("Unable to refresh token:", refreshError);
+          clearAccessToken();
+          clearRefreshToken();
+          // Optionally, redirect to login page
+          window.location.href = "/login";
+          return Promise.reject(refreshError);
+        }
+      }
+    }
     return Promise.reject(error);
   }
 );
 
 // Export all API modules
-export * from './file';
-export * from './attachment';
-export * from './notice';
+export * from "./file";
+export * from "./attachment";
+export * from "./notice";

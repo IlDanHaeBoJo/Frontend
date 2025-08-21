@@ -67,12 +67,14 @@ const Registration = () => {
           </S.ToggleButton>
         </S.ToggleButtonContainer>
 
+        <S.Label>아이디</S.Label>
         <S.Input
           {...register("username", { required: "아이디를 입력해주세요." })}
           placeholder="아이디를 입력하세요"
         />
         {errors.username && <S.ErrorMsg>{errors.username.message}</S.ErrorMsg>}
 
+        <S.Label>비밀번호</S.Label>
         <S.Input
           type="password"
           {...register("password", { required: "비밀번호를 입력해주세요." })}
@@ -89,16 +91,27 @@ const Registration = () => {
           })}
           placeholder="비밀번호를 다시 입력하세요"
         />
+        {watch("passwordConfirm") && (
+          <S.PasswordMatchMessage
+            isMatch={watch("password") === watch("passwordConfirm")}
+          >
+            {watch("password") === watch("passwordConfirm")
+              ? "비밀번호가 일치합니다."
+              : "비밀번호가 일치하지 않습니다."}
+          </S.PasswordMatchMessage>
+        )}
         {errors.passwordConfirm && (
           <S.ErrorMsg>{errors.passwordConfirm.message}</S.ErrorMsg>
         )}
 
+        <S.Label>이름</S.Label>
         <S.Input
           {...register("name", { required: "이름을 입력해주세요." })}
           placeholder="이름을 입력하세요"
         />
         {errors.name && <S.ErrorMsg>{errors.name.message}</S.ErrorMsg>}
 
+        <S.Label>이메일</S.Label>
         <S.Input
           type="email"
           {...register("email", {
@@ -114,10 +127,12 @@ const Registration = () => {
 
         {role === "student" && (
           <>
+            <S.Label>학번</S.Label>
             <S.Input
               {...register("student_id")}
               placeholder="학번 (선택 사항)"
             />
+            <S.Label>전공</S.Label>
             <S.Input {...register("major")} placeholder="전공 (선택 사항)" />
           </>
         )}
