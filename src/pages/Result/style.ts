@@ -4,7 +4,7 @@ import { colors } from "../../styles/colors";
 export const Container = styled.div`
   padding: 50px 50px 0 50px;
   background-color: ${colors.white};
-  height: calc(100vh - 260px);
+  height: calc(100vh - 140px);
 `;
 
 export const Board = styled.div`
