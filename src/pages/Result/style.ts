@@ -206,7 +206,7 @@ export const PdfButton = styled.button`
 
 export const FeedbackTextarea = styled.textarea`
   width: 100%;
-  min-height: 150px;
+  min-height: 100px;
   padding: 15px;
   border-radius: 8px;
   border: 1px solid ${colors.gray300};
@@ -214,15 +214,34 @@ export const FeedbackTextarea = styled.textarea`
   line-height: 1.6;
   resize: vertical;
   margin-bottom: 15px;
+  box-sizing: border-box;
+`;
+
+export const ScoreInputContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+`;
+
+export const ScoreLabel = styled.span`
+  font-size: 16px;
+  font-weight: 600;
+  padding-bottom: 4px;
 `;
 
 export const ScoreInput = styled.input`
-  width: 100px;
-  padding: 10px;
-  border-radius: 8px;
-  border: 1px solid ${colors.gray300};
+  width: 80px;
+  border: none;
+  border-bottom: 2px solid ${colors.gray300};
+  background-color: transparent;
   font-size: 16px;
   text-align: center;
+  padding: 5px;
+
+  &:focus {
+    outline: none;
+    border-bottom-color: ${colors.blue};
+  }
 `;
 
 export const LoadingSpinner = styled.div`

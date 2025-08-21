@@ -187,14 +187,16 @@ const ResultDetailModal: React.FC<ResultDetailModalProps> = ({
                     }
                     placeholder="피드백을 입력하세요..."
                   />
-                  <S.ScoreInput
-                    type="number"
-                    value={score}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                      setScore(parseInt(e.target.value, 10))
-                    }
-                    placeholder="점수 입력"
-                  />
+                  <S.ScoreInputContainer>
+                    <S.ScoreLabel>점수 :</S.ScoreLabel>
+                    <S.ScoreInput
+                      type="number"
+                      value={score}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                        setScore(parseInt(e.target.value, 10))
+                      }
+                    />
+                  </S.ScoreInputContainer>
                 </>
               ) : (
                 <S.FeedbackContent>
