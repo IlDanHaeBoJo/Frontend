@@ -75,7 +75,7 @@ const FooterContainer = styled.footer`
 `;
 
 const Inner = styled.div`
-  width: 1200px;
+  max-width: 1500px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;

@@ -3,7 +3,7 @@ import { colors } from "../../styles/colors";
 
 export const Container = styled.div`
   padding: 40px;
-  max-width: 1500px;
+  max-width: 1200px;
   margin: 0 auto;
   background-color: ${colors.white};
   min-height: calc(100vh - 170px);

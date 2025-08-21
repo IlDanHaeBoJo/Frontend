@@ -4,7 +4,7 @@ import { colors } from "../../styles/colors";
 export const Container = styled.div`
   padding: 40px;
   margin: 0 auto;
-  max-width: 1500px;
+  max-width: 1200px;
   background-color: ${colors.white};
   min-height: calc(100vh - 170px);
 `;
@@ -19,7 +19,7 @@ export const Title = styled.h1`
 
 export const StudentGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 30px;
 `;
 
