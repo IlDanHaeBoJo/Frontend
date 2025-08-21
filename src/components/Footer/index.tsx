@@ -27,8 +27,7 @@ const Footer = () => {
           </FLeft>
           <FRight>
             <LinkGo>
-              <Link to="/home">HOME</Link>
-              <Link to="/mypage">MYPAGE</Link>
+              <Link to="/">HOME</Link>
             </LinkGo>
             <LinkSns>
               <a
@@ -59,7 +58,7 @@ const Footer = () => {
             </Link>
             <a>저작권 정책</a>
           </FMenu>
-          <FCopy>© 2025 MediCPX. All rights reserved.</FCopy>
+          <FCopy>Copyright© 2025 MediCPX. All rights reserved.</FCopy>
         </FBtm>
       </Inner>
     </FooterContainer>
@@ -100,8 +99,6 @@ const FRight = styled.div`
   align-items: flex-end;
   justify-content: flex-end;
   gap: 15px;
-  height: 100%;
-  margin-top: 20px;
 `;
 
 const FLogoContainer = styled.div`
