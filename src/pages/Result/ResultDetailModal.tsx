@@ -36,6 +36,7 @@ const ResultDetailModal: React.FC<ResultDetailModalProps> = ({
         evaluation_status: "피드백 완료",
       });
       alert("피드백이 성공적으로 저장되었습니다.");
+      window.location.reload();
       onClose();
     } catch (error) {
       console.error("Failed to save feedback:", error);

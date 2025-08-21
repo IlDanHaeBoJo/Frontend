@@ -24,6 +24,10 @@ export const ProfileImage = styled.div`
   height: 120px;
   background-color: ${colors.gray200};
   border-radius: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 60px;
 `;
 
 export const UserName = styled.h1`

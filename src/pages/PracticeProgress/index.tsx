@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import * as S from "./style";
 import { ServerMessage } from "../../types/practice";
+import elderlyMen from "../../assets/elderly_men.png";
 
 const PracticeProgress = () => {
   // 상태 관리
@@ -275,7 +276,13 @@ const PracticeProgress = () => {
       </S.ControlSection>
       <S.PracticeArea>
         <S.PatientVideoArea>
-          <S.PatientAvatar>👨‍💼</S.PatientAvatar>
+          <S.PatientAvatar>
+            <img
+              src={elderlyMen}
+              alt="Patient"
+              style={{ width: "100%", height: "100%", objectFit: "cover" }}
+            />
+          </S.PatientAvatar>
           <S.PatientName>{patientName}</S.PatientName>
           <S.StatusBadge>
             {!isConnected
