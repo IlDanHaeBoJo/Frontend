@@ -2,23 +2,41 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import * as S from "./style";
 import { getStudents } from "../../apis/user";
+import { getAdminCpxResults } from "../../apis/cpx";
 import { User } from "../../types/user";
+import { CpxResult } from "../../types/result";
 
 const Evaluation = () => {
   const [students, setStudents] = useState<User[]>([]);
+  const [practiceCounts, setPracticeCounts] = useState<{
+    [key: number]: number;
+  }>({});
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchStudents = async () => {
+    const fetchData = async () => {
       try {
-        const data = await getStudents();
-        setStudents(data);
+        const [studentsData, resultsData] = await Promise.all([
+          getStudents(),
+          getAdminCpxResults(),
+        ]);
+
+        setStudents(studentsData);
+
+        const counts = resultsData.reduce(
+          (acc: { [key: number]: number }, result: CpxResult) => {
+            acc[result.student_id] = (acc[result.student_id] || 0) + 1;
+            return acc;
+          },
+          {}
+        );
+        setPracticeCounts(counts);
       } catch (error) {
-        console.error("Failed to fetch students:", error);
+        console.error("Failed to fetch data:", error);
       }
     };
 
-    fetchStudents();
+    fetchData();
   }, []);
 
   return (
@@ -31,7 +49,7 @@ const Evaluation = () => {
             <S.StudentId>학번: {student.student_id || "N/A"}</S.StudentId>
             <S.Stats>
               <S.StatLabel>실습 횟수 :</S.StatLabel>
-              <S.StatValue>null 회</S.StatValue>
+              <S.StatValue>{practiceCounts[student.id] || 0} 회</S.StatValue>
             </S.Stats>
             {/* <S.LastPractice>
               최근 실습:{" "}
