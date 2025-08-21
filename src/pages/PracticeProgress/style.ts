@@ -2,9 +2,9 @@ import styled from "styled-components";
 import { colors } from "../../styles/colors";
 
 export const Container = styled.div`
-  padding: 20px;
+  padding: 50px 0;
   background-color: ${colors.white};
-  min-height: calc(100vh - 250px);
+  min-height: calc(100vh - 190px);
 `;
 
 export const ControlSection = styled.div`
@@ -12,7 +12,7 @@ export const ControlSection = styled.div`
   justify-content: center;
   align-items: center;
   gap: 20px;
-  margin-bottom: 20px;
+  margin-bottom: 30px;
 `;
 
 export const Timer = styled.div`

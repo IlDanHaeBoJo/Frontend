@@ -4,7 +4,7 @@ import { colors } from "../../styles/colors";
 export const Container = styled.div`
   display: flex;
   justify-content: center;
-  align-items: center;
+  padding-top: 160px;
   height: calc(100vh - 90px);
   gap: 40px;
   background-color: ${colors.white};
