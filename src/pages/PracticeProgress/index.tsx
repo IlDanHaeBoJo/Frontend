@@ -308,7 +308,7 @@ const PracticeProgress = () => {
             />
           </S.MemoCard>
           {/* 확인용 대화내용 로그 추후에 삭제 */}
-          <S.MemoCard>
+          {/* <S.MemoCard>
             <S.CardHeader>
               <span>✍️</span>
               <span>대화 내용 -삭제예정</span>
@@ -323,7 +323,7 @@ const PracticeProgress = () => {
                 </div>
               ))}
             </S.NotesArea>
-          </S.MemoCard>
+          </S.MemoCard> */}
         </S.InfoPanel>
       </S.PracticeArea>
     </S.Container>

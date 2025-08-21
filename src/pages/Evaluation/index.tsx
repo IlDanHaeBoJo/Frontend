@@ -30,14 +30,8 @@ const Evaluation = () => {
             <S.StudentName>{student.name}</S.StudentName>
             <S.StudentId>학번: {student.student_id || "N/A"}</S.StudentId>
             <S.Stats>
-              <S.Stat>
-                <S.StatValue>null</S.StatValue>
-                <S.StatLabel>실습 횟수</S.StatLabel>
-              </S.Stat>
-              <S.Stat>
-                <S.StatValue>null</S.StatValue>
-                <S.StatLabel>피드백</S.StatLabel>
-              </S.Stat>
+              <S.StatLabel>실습 횟수 :</S.StatLabel>
+              <S.StatValue>null 회</S.StatValue>
             </S.Stats>
             {/* <S.LastPractice>
               최근 실습:{" "}
