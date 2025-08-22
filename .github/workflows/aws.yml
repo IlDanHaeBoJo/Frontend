@@ -8,7 +8,11 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-
+    env:
+      CI: false
+      REACT_APP_API_URL: ${{ secrets.REACT_APP_API_URL }}
+      REACT_APP_WEBSOCKET_URL: ${{ secrets.REACT_APP_WEBSOCKET_URL }}
+      
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -20,9 +24,14 @@ jobs:
 
       - name: Install dependencies
         run: npm install
+        
+      - name: Create .env file
+        run: |
+          echo "REACT_APP_API_URL=${{ secrets.REACT_APP_API_URL }}" >> .env
+          echo "REACT_APP_WEBSOCKET_URL=${{ secrets.REACT_APP_WEBSOCKET_URL }}" >> .env
 
       - name: Build React app
-        run: CI=false npm run build
+        run: npm run build
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
