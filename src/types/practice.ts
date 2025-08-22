@@ -8,4 +8,5 @@ export interface ServerMessage {
   conversation_ended?: boolean;
   scenarios?: Record<string, { name: string; description: string }>;
   scenario_name?: string;
+  result_id?: number;
 }

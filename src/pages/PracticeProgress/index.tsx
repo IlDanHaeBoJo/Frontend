@@ -2,13 +2,14 @@ import React, { useState, useRef, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import * as S from "./style";
 import { ServerMessage } from "../../types/practice";
+import { saveCpxMemo } from "../../apis/cpx";
 import elderlyMen from "../../assets/elderly_men.png";
 import { useUser } from "../../store/UserContext";
 
 const PracticeProgress = () => {
   // 사용자 정보
   const { user } = useUser();
-  
+
   // 상태 관리
   const [isConnected, setIsConnected] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -19,6 +20,8 @@ const PracticeProgress = () => {
   const [timer, setTimer] = useState(0);
   const [statusMessage, setStatusMessage] = useState("대기 중");
   const [patientName, setPatientName] = useState("환자");
+  const [memo, setMemo] = useState("");
+  const [resultId, setResultId] = useState<number | null>(null);
   const [conversation, setConversation] = useState<
     { speaker_role: "doctor" | "patient"; text: string }[]
   >([]);
@@ -42,7 +45,7 @@ const PracticeProgress = () => {
     setActivityStatus("talking");
     setIsPlaying(true);
     setIsTTSPlaying(true);
-    
+
     if (audioSource.current && audioWorkletNode.current) {
       try {
         audioSource.current.disconnect(audioWorkletNode.current);
@@ -51,11 +54,11 @@ const PracticeProgress = () => {
         console.error("오디오 연결 해제 오류:", error);
       }
     }
-    
+
     if (audioWorkletNode.current) {
       audioWorkletNode.current.port.postMessage({
         command: "setTTSState",
-        isPlaying: true
+        isPlaying: true,
       });
     }
 
@@ -64,26 +67,26 @@ const PracticeProgress = () => {
     if (audioData && audioPlayer.current) {
       try {
         console.log(`🔊 TTS Base64 오디오 수신: ${audioData.length} 문자`);
-        
+
         const binaryString = atob(audioData);
         const bytes = new Uint8Array(binaryString.length);
         for (let i = 0; i < binaryString.length; i++) {
           bytes[i] = binaryString.charCodeAt(i);
         }
-        const audioBlob = new Blob([bytes], { type: 'audio/mpeg' });
-        
+        const audioBlob = new Blob([bytes], { type: "audio/mpeg" });
+
         const objectUrl = URL.createObjectURL(audioBlob);
         audioPlayer.current.src = objectUrl;
-        
+
         console.log("🔊 TTS 음성 재생 시작 (메모리 버퍼)");
         await audioPlayer.current.play();
-        
+
         audioPlayer.current.onended = async () => {
           console.log("✅ TTS 음성 재생 완료");
           URL.revokeObjectURL(objectUrl);
-          
-          await new Promise(resolve => setTimeout(resolve, 500));
-          
+
+          await new Promise((resolve) => setTimeout(resolve, 500));
+
           if (audioSource.current && audioWorkletNode.current) {
             try {
               audioSource.current.connect(audioWorkletNode.current);
@@ -92,14 +95,14 @@ const PracticeProgress = () => {
               console.error("오디오 연결 재개 오류:", error);
             }
           }
-          
+
           if (audioWorkletNode.current) {
             audioWorkletNode.current.port.postMessage({
               command: "setTTSState",
-              isPlaying: false
+              isPlaying: false,
             });
           }
-          
+
           setIsTTSPlaying(false);
           setIsPlaying(false);
           setActivityStatus("listening");
@@ -120,7 +123,7 @@ const PracticeProgress = () => {
   // 웹소켓 연결 및 해제
   const connectWebSocket = useCallback(() => {
     const userId = user?.id;
-    
+
     const wsUrl = `${process.env.REACT_APP_WEBSOCKET_URL}/ws/${userId}`;
 
     if (websocket.current) {
@@ -169,6 +172,9 @@ const PracticeProgress = () => {
         break;
       case "session_started":
         setPatientName(message.scenario_name || "환자");
+        if (message.result_id) {
+          setResultId(message.result_id);
+        }
         break;
       case "voice_response":
         if (message.user_text) {
@@ -266,7 +272,7 @@ const PracticeProgress = () => {
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (timerInterval.current) {
       clearInterval(timerInterval.current);
     }
@@ -277,6 +283,17 @@ const PracticeProgress = () => {
     if (audioContext.current && audioContext.current.state !== "closed") {
       audioContext.current.close();
     }
+
+    if (resultId) {
+      try {
+        await saveCpxMemo(resultId, { memo });
+        alert("메모가 성공적으로 저장되었습니다.");
+      } catch (error) {
+        console.error("Failed to save memo:", error);
+        alert("메모 저장에 실패했습니다.");
+      }
+    }
+
     navigate("/result");
   };
 
@@ -355,6 +372,8 @@ const PracticeProgress = () => {
               <span>메모장</span>
             </S.CardHeader>
             <S.MemoArea
+              value={memo}
+              onChange={(e) => setMemo(e.target.value)}
               height="200px"
               placeholder="이곳에 메모를 작성하세요."
             />

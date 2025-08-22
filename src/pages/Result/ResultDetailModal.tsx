@@ -74,29 +74,32 @@ const ResultDetailModal: React.FC<ResultDetailModalProps> = ({
                             )
                           : resultDetail.cpx_detail.system_evaluation_data;
 
-                      const transcriptString =
-                        data.langgraph_text_analysis?.evaluation_metadata
-                          ?.conversation_transcript;
+                      const conversationEntries = data.conversation_entries;
 
-                      if (!transcriptString) {
-                        return resultDetail.cpx_detail.conversation_transcript; // Fallback
+                      if (
+                        !conversationEntries ||
+                        !Array.isArray(conversationEntries)
+                      ) {
+                        return "대화 내역을 불러올 수 없습니다.";
                       }
 
-                      const transcript = JSON.parse(transcriptString);
-
-                      return transcript.map((entry: any, index: number) => (
-                        <div key={index}>
-                          <strong
-                            style={{
-                              color:
-                                entry.role === "doctor" ? "#007bff" : "#28a745",
-                            }}
-                          >
-                            {entry.role === "doctor" ? "의사" : "환자"}:
-                          </strong>{" "}
-                          {entry.content}
-                        </div>
-                      ));
+                      return conversationEntries.map(
+                        (entry: any, index: number) => (
+                          <div key={index}>
+                            <strong
+                              style={{
+                                color:
+                                  entry.role === "doctor"
+                                    ? "#007bff"
+                                    : "#28a745",
+                              }}
+                            >
+                              {entry.role === "doctor" ? "의사" : "환자"}:
+                            </strong>{" "}
+                            {entry.text}
+                          </div>
+                        )
+                      );
                     } catch (e) {
                       // Fallback on error
                       return resultDetail.cpx_detail.conversation_transcript;

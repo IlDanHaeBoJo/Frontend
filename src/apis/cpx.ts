@@ -36,3 +36,8 @@ export const saveCpxFeedback = async (
   const response = await api.put(`/admin/cpx/${resultId}/evaluate`, feedback);
   return response.data;
 };
+
+export const saveCpxMemo = async (resultId: number, memo: { memo: string }) => {
+  const response = await api.put(`/cpx/${resultId}/details`, memo);
+  return response.data;
+};
