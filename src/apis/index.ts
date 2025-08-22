@@ -74,3 +74,4 @@ api.interceptors.response.use(
 export * from "./file";
 export * from "./attachment";
 export * from "./notice";
+export * from "./scenario";

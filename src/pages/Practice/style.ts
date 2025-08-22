@@ -91,3 +91,29 @@ export const StartButton = styled.button`
     background-color: ${colors.darkBlue};
   }
 `;
+
+export const PatientImageContainer = styled.div`
+  width: 380px;
+  height: 200px;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: ${colors.white};
+  border: 1px solid ${colors.gray400};
+  border-radius: 4px;
+  overflow: hidden;
+`;
+
+export const PatientImage = styled.img`
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: cover;
+  border-radius: 4px;
+`;
+
+export const LoadingText = styled.div`
+  font-family: "Inter", sans-serif;
+  font-size: 16px;
+  color: ${colors.gray500};
+`;
