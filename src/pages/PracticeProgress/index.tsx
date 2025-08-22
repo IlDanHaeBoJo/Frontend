@@ -3,12 +3,17 @@ import { useNavigate } from "react-router-dom";
 import * as S from "./style";
 import { ServerMessage } from "../../types/practice";
 import elderlyMen from "../../assets/elderly_men.png";
+import { useUser } from "../../store/UserContext";
 
 const PracticeProgress = () => {
+  // 사용자 정보
+  const { user } = useUser();
+  
   // 상태 관리
   const [isConnected, setIsConnected] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isPracticeStarted, setIsPracticeStarted] = useState(false);
+  const [isTTSPlaying, setIsTTSPlaying] = useState(false);
   type ActivityStatus = "listening" | "processing" | "talking" | "idle";
   const [activityStatus, setActivityStatus] = useState<ActivityStatus>("idle");
   const [timer, setTimer] = useState(0);
@@ -36,28 +41,77 @@ const PracticeProgress = () => {
 
     setActivityStatus("talking");
     setIsPlaying(true);
-    const audioUrl = audioQueue.current.shift();
-
-    if (audioUrl && audioPlayer.current) {
+    setIsTTSPlaying(true);
+    
+    if (audioSource.current && audioWorkletNode.current) {
       try {
-        const response = await fetch(
-          `${process.env.REACT_APP_API_URL}/cache/tts/${audioUrl}`
-        );
-        const audioBlob = await response.blob();
+        audioSource.current.disconnect(audioWorkletNode.current);
+        console.log("🎤 마이크 입력 일시 차단 (TTS 재생 중)");
+      } catch (error) {
+        console.error("오디오 연결 해제 오류:", error);
+      }
+    }
+    
+    if (audioWorkletNode.current) {
+      audioWorkletNode.current.port.postMessage({
+        command: "setTTSState",
+        isPlaying: true
+      });
+    }
+
+    const audioData = audioQueue.current.shift();
+
+    if (audioData && audioPlayer.current) {
+      try {
+        console.log(`🔊 TTS Base64 오디오 수신: ${audioData.length} 문자`);
+        
+        const binaryString = atob(audioData);
+        const bytes = new Uint8Array(binaryString.length);
+        for (let i = 0; i < binaryString.length; i++) {
+          bytes[i] = binaryString.charCodeAt(i);
+        }
+        const audioBlob = new Blob([bytes], { type: 'audio/mpeg' });
+        
         const objectUrl = URL.createObjectURL(audioBlob);
         audioPlayer.current.src = objectUrl;
-        audioPlayer.current.play();
-        audioPlayer.current.onended = () => {
+        
+        console.log("🔊 TTS 음성 재생 시작 (메모리 버퍼)");
+        await audioPlayer.current.play();
+        
+        audioPlayer.current.onended = async () => {
+          console.log("✅ TTS 음성 재생 완료");
           URL.revokeObjectURL(objectUrl);
+          
+          await new Promise(resolve => setTimeout(resolve, 500));
+          
+          if (audioSource.current && audioWorkletNode.current) {
+            try {
+              audioSource.current.connect(audioWorkletNode.current);
+              console.log("🎤 마이크 입력 재개");
+            } catch (error) {
+              console.error("오디오 연결 재개 오류:", error);
+            }
+          }
+          
+          if (audioWorkletNode.current) {
+            audioWorkletNode.current.port.postMessage({
+              command: "setTTSState",
+              isPlaying: false
+            });
+          }
+          
+          setIsTTSPlaying(false);
           setIsPlaying(false);
           setActivityStatus("listening");
         };
       } catch (error) {
-        console.error("Error fetching or playing audio:", error);
+        console.error("TTS 재생 오류:", error);
+        setIsTTSPlaying(false);
         setIsPlaying(false);
         setActivityStatus("listening");
       }
     } else {
+      setIsTTSPlaying(false);
       setIsPlaying(false);
       setActivityStatus("listening");
     }
@@ -65,7 +119,8 @@ const PracticeProgress = () => {
 
   // 웹소켓 연결 및 해제
   const connectWebSocket = useCallback(() => {
-    const userId = `user_${Date.now()}`; // 임시 사용자 ID
+    const userId = user?.id;
+    
     const wsUrl = `${process.env.REACT_APP_WEBSOCKET_URL}/ws/${userId}`;
 
     if (websocket.current) {
@@ -128,11 +183,8 @@ const PracticeProgress = () => {
             { speaker_role: "patient", text: message.ai_text! },
           ]);
         }
-        if (message.audio_url) {
-          if (audioSource.current && audioWorkletNode.current) {
-            audioSource.current.disconnect(audioWorkletNode.current);
-          }
-          audioQueue.current.push(message.audio_url);
+        if (message.tts_audio_base64) {
+          audioQueue.current.push(message.tts_audio_base64);
           processAudioQueue();
         }
         break;
