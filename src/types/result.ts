@@ -1,7 +1,7 @@
 export interface CpxDetail {
-  conversation_transcript: string;
+  conversation_transcript?: string;
   memo: string;
-  system_evaluation_data: string;
+  system_evaluation_data: any;
   detail_id: number;
   result_id: number;
   last_updated_at: string;

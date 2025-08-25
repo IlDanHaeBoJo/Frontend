@@ -3,9 +3,10 @@ export interface ServerMessage {
   message?: string;
   user_text?: string;
   ai_text?: string;
-  audio_url?: string;
+  tts_audio_base64?: string;
   avatar_action?: string;
   conversation_ended?: boolean;
   scenarios?: Record<string, { name: string; description: string }>;
   scenario_name?: string;
+  result_id?: number;
 }

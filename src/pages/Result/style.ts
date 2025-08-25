@@ -159,6 +159,8 @@ export const ConversationBox = styled.div`
   padding: 20px;
   border-radius: 8px;
   min-height: 250px;
+  max-height: 500px;
+  overflow-y: auto;
   p {
     margin: 0 0 10px 0;
     font-size: 16px;
