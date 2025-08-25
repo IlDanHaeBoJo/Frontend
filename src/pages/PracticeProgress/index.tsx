@@ -1,16 +1,12 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import * as S from "./style";
 import { ServerMessage } from "../../types/practice";
 import elderlyMen from "../../assets/elderly_men.png";
 import { useUser } from "../../store/UserContext";
-import { getScenarioImage } from "../../apis/scenario";
 
 const PracticeProgress = () => {
   const { user } = useUser();
-  const location = useLocation();
-  const navigate = useNavigate();
-  
   // 상태 관리
   const [isConnected, setIsConnected] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -20,10 +16,10 @@ const PracticeProgress = () => {
   const [timer, setTimer] = useState(0);
   const [statusMessage, setStatusMessage] = useState("대기 중");
   const [patientName, setPatientName] = useState("환자");
-  const [patientImage, setPatientImage] = useState<string>("");
   const [conversation, setConversation] = useState<
     { speaker_role: "doctor" | "patient"; text: string }[]
   >([]);
+  const navigate = useNavigate();
 
   // Ref 관리
   const timerInterval = useRef<NodeJS.Timeout | null>(null);
@@ -234,17 +230,6 @@ const PracticeProgress = () => {
     navigate("/result");
   };
 
-  // 전달받은 환자 이미지 URL 사용
-  useEffect(() => {
-    const { patientImageUrl, scenarioId } = location.state || {};
-    if (patientImageUrl) {
-      setPatientImage(patientImageUrl);
-    }
-    if (scenarioId) {
-      setPatientName(`시나리오 ${scenarioId}`);
-    }
-  }, [location.state]);
-
   // 컴포넌트 마운트/언마운트 시 효과
   useEffect(() => {
     connectWebSocket();
@@ -295,13 +280,9 @@ const PracticeProgress = () => {
         <S.PatientVideoArea>
           <S.PatientAvatar>
             <img
-              src={patientImage || elderlyMen}
+              src={elderlyMen}
               alt="Patient"
               style={{ width: "100%", height: "100%", objectFit: "cover" }}
-              onError={(e) => {
-                console.error("환자 이미지 로드 실패:", e);
-                e.currentTarget.src = elderlyMen;
-              }}
             />
           </S.PatientAvatar>
           <S.PatientName>{patientName}</S.PatientName>
