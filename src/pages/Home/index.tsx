@@ -34,7 +34,7 @@ const HomePage: React.FC = () => {
             </FeatureDescription>
           </Feature>
           <Feature>
-            <FeatureTitle>실시간 피드백</FeatureTitle>
+            <FeatureTitle>피드백</FeatureTitle>
             <FeatureDescription>
               실습 중 AI가 실시간으로 피드백을 제공하여, 부족한 부분을 바로잡을
               수 있습니다.

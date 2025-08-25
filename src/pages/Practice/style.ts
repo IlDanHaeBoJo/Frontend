@@ -60,6 +60,21 @@ export const Dropdown = styled.div<{ isHidden?: boolean }>`
   }
 `;
 
+export const Select = styled.select`
+  width: 380px;
+  height: 50px;
+  padding: 0 20px;
+  background-color: ${colors.white};
+  border: 1px solid ${colors.gray400};
+  border-radius: 4px;
+  margin-bottom: 30px;
+  box-sizing: border-box;
+  cursor: pointer;
+  font-family: "Inter", sans-serif;
+  font-size: 16px;
+  color: ${colors.gray500};
+`;
+
 export const StartButton = styled.button`
   width: 380px;
   height: 60px;

@@ -7,9 +7,9 @@ import elderlyMen from "../../assets/elderly_men.png";
 import { useUser } from "../../store/UserContext";
 
 const PracticeProgress = () => {
+
   // 사용자 정보
   const { user } = useUser();
-
   // 상태 관리
   const [isConnected, setIsConnected] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -123,7 +123,6 @@ const PracticeProgress = () => {
   // 웹소켓 연결 및 해제
   const connectWebSocket = useCallback(() => {
     const userId = user?.id;
-
     const wsUrl = `${process.env.REACT_APP_WEBSOCKET_URL}/ws/${userId}`;
 
     if (websocket.current) {
@@ -366,6 +365,13 @@ const PracticeProgress = () => {
           </S.StatusBadge>
         </S.PatientVideoArea>
         <S.InfoPanel>
+          <S.MemoCard>
+            <S.CardHeader>
+              <span>📋</span>
+              <span>환자 정보</span>
+            </S.CardHeader>
+            Vital : 160/90 - 20 - 36.5
+          </S.MemoCard>
           <S.MemoCard>
             <S.CardHeader>
               <span>✍️</span>
