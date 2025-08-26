@@ -9,7 +9,7 @@ import {
   getAdminCpxResultDetail,
 } from "../../apis/cpx";
 import { CpxResult, ResultDetail } from "../../types/result";
-import testData from "./test_data.json";
+// import testData from "./test_data.json";
 
 const Result = () => {
   const { id } = useParams<{ id: string }>();
