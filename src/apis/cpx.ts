@@ -1,7 +1,7 @@
 import { api } from "./index";
 
 export const getAdminCpxResults = async () => {
-  const response = await api.get("/admin/cpx");
+  const response = await api.get("/admin/cpx/");
   return response.data;
 };
 

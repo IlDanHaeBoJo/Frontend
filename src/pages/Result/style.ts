@@ -159,7 +159,7 @@ export const ConversationBox = styled.div`
   padding: 20px;
   border-radius: 8px;
   min-height: 250px;
-  max-height: 500px;
+  max-height: 400px;
   overflow-y: auto;
   p {
     margin: 0 0 10px 0;
@@ -171,6 +171,18 @@ export const FeedbackSection = styled(Section)`
   border: 1px solid ${colors.gray200};
   padding: 30px;
   border-radius: 8px;
+  line-height: 1;
+  h1,
+  h2 {
+    margin: 10px 0;
+  }
+  h3 {
+    margin: 0;
+  }
+  ol,
+  ul {
+    margin: 0 0 5px 0;
+  }
 `;
 
 export const ProfessorFeedbackSection = styled(FeedbackSection)`

@@ -70,13 +70,6 @@ export const StatLabel = styled.p`
   margin: 0;
 `;
 
-export const LastPractice = styled.p`
-  font-family: "Inter", sans-serif;
-  font-size: 14px;
-  color: ${colors.gray600};
-  margin: 0 0 15px 0;
-`;
-
 export const EvalButton = styled.button`
   width: 100%;
   height: 45px;

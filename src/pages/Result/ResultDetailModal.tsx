@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import * as S from "./style";
 import { ResultDetail } from "../../types/result";
 import { saveCpxFeedback } from "../../apis/cpx";
+import ReactMarkdown from "react-markdown";
 
 interface ResultDetailModalProps {
   onClose: () => void;
@@ -114,70 +115,44 @@ const ResultDetailModal: React.FC<ResultDetailModalProps> = ({
                 </S.ConversationBox>
               </S.Section>
             </S.ConversationSectionContainer>
+            <S.SectionTitle>AI 평가 내역</S.SectionTitle>
             <S.FeedbackSection>
-              <S.SectionTitle>AI 평가 내역</S.SectionTitle>
-              <S.FeedbackContent>
-                {(() => {
-                  try {
-                    const data =
-                      typeof resultDetail.cpx_detail.system_evaluation_data ===
-                      "string"
-                        ? JSON.parse(
-                            resultDetail.cpx_detail.system_evaluation_data
-                          )
-                        : resultDetail.cpx_detail.system_evaluation_data;
+              {(() => {
+                try {
+                  const data =
+                    typeof resultDetail.cpx_detail.system_evaluation_data ===
+                    "string"
+                      ? JSON.parse(
+                          resultDetail.cpx_detail.system_evaluation_data
+                        )
+                      : resultDetail.cpx_detail.system_evaluation_data;
 
-                    const analysis = data.langgraph_text_analysis || {};
+                  const analysis = data.langgraph_text_analysis || {};
 
+                  // 👉 markdown_feedback을 렌더링
+                  if (analysis.markdown_feedback) {
                     return (
-                      <div>
-                        <h4>
-                          종합 점수: {analysis.scores?.total_score || "N/A"} (
-                          {analysis.scores?.grade || "N/A"})
-                        </h4>
-                        <p>
-                          <strong>종합 평가:</strong>{" "}
-                          {analysis.feedback?.overall_feedback || "N/A"}
-                        </p>
-                        <div>
-                          <strong>강점:</strong>
-                          <ul>
-                            {analysis.feedback?.strengths?.map(
-                              (item: string, index: number) => (
-                                <li key={index}>{item}</li>
-                              )
-                            ) || <li>N/A</li>}
-                          </ul>
-                        </div>
-                        <div>
-                          <strong>개선점:</strong>
-                          <ul>
-                            {analysis.feedback?.weaknesses?.map(
-                              (item: string, index: number) => (
-                                <li key={index}>{item}</li>
-                              )
-                            ) || <li>N/A</li>}
-                          </ul>
-                        </div>
-                        <p>
-                          <strong>종합 분석:</strong>{" "}
-                          {analysis.feedback?.comprehensive_analysis || "N/A"}
-                        </p>
+                      <div style={{ whiteSpace: "pre-wrap" }}>
+                        <ReactMarkdown>
+                          {analysis.markdown_feedback}
+                        </ReactMarkdown>
                       </div>
                     );
-                  } catch (e) {
-                    return (
-                      <pre>
-                        {JSON.stringify(
-                          resultDetail.cpx_detail.system_evaluation_data,
-                          null,
-                          2
-                        )}
-                      </pre>
-                    );
                   }
-                })()}
-              </S.FeedbackContent>
+
+                  return "AI 평가 내역이 없습니다.";
+                } catch (e) {
+                  return (
+                    <pre>
+                      {JSON.stringify(
+                        resultDetail.cpx_detail.system_evaluation_data,
+                        null,
+                        2
+                      )}
+                    </pre>
+                  );
+                }
+              })()}
             </S.FeedbackSection>
             <S.ProfessorFeedbackSection>
               <S.SectionTitle>교수님 피드백</S.SectionTitle>
@@ -207,12 +182,17 @@ const ResultDetailModal: React.FC<ResultDetailModalProps> = ({
                 </S.FeedbackContent>
               )}
             </S.ProfessorFeedbackSection>
-            {isAdmin ? (
+            {/* {isAdmin ? (
               <S.PdfButton onClick={handleSaveFeedback}>
                 피드백 저장
               </S.PdfButton>
             ) : (
               <S.PdfButton>PDF로 저장</S.PdfButton>
+            )} */}
+            {isAdmin && (
+              <S.PdfButton onClick={handleSaveFeedback}>
+                피드백 저장
+              </S.PdfButton>
             )}
           </S.ModalContent>
         )}
