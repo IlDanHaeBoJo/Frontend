@@ -4,7 +4,7 @@ import { getPrivacyPolicy } from "../../apis/privacy";
 import { PrivacyPolicyResponse } from "../../types/privacy";
 
 const PrivacyPolicy = () => {
-  const [policy, setPolicy] = useState<PrivacyPolicyResponse | null>(null);
+  const [policy, setPolicy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -13,9 +13,12 @@ const PrivacyPolicy = () => {
         const responseData: PrivacyPolicyResponse[] = await getPrivacyPolicy();
         console.log("API로부터 받은 데이터:", responseData);
         if (responseData && responseData.length > 0) {
-          setPolicy(responseData[0]);
+          setPolicy(responseData[0].content);
         } else {
-          setError("개인정보 처리방침 데이터를 찾을 수 없습니다.");
+          // setError("개인정보 처리방침 데이터를 찾을 수 없습니다.");
+          const res = await fetch("/privacy.txt");
+          const text = await res.text();
+          setPolicy(text);
         }
       } catch (err) {
         console.error("Failed to fetch privacy policy:", err);
@@ -44,9 +47,9 @@ const PrivacyPolicy = () => {
 
   return (
     <S.Container>
-      <h1>{policy.title}</h1>
+      <h1>개인정보 처리방침</h1>
       <S.Content>
-        {policy.content.split("\n").map((line, index) => {
+        {policy.split("\n").map((line, index) => {
           if (line.trim().startsWith("□")) {
             return (
               <React.Fragment key={index}>
