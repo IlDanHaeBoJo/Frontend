@@ -51,10 +51,6 @@ const Evaluation = () => {
               <S.StatLabel>실습 횟수 :</S.StatLabel>
               <S.StatValue>{practiceCounts[student.id] || 0} 회</S.StatValue>
             </S.Stats>
-            {/* <S.LastPractice>
-              최근 실습:{" "}
-              {new Date(student.last_practice_date).toLocaleDateString()}
-            </S.LastPractice> */}
             <S.EvalButton onClick={() => navigate(`/result/${student.id}`)}>
               📝 평가하기
             </S.EvalButton>
