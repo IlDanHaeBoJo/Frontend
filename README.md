@@ -45,7 +45,6 @@ See the section about [deployment](https://facebook.github.io/create-react-app/d
 ```
 REACT_APP_API_URL=http://백엔드 서버 주소
 REACT_APP_WEBSOCKET_URL=ws://백엔드 서버 주소
-
 ```
 
 ## 프로젝트 구조
