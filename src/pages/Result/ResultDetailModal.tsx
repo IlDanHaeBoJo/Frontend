@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import * as S from "./style";
 import { ResultDetail } from "../../types/result";
 import { saveCpxFeedback } from "../../apis/cpx";
@@ -17,6 +18,8 @@ const ResultDetailModal: React.FC<ResultDetailModalProps> = ({
   resultDetail,
   isAdmin,
 }) => {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [feedback, setFeedback] = useState("");
   const [score, setScore] = useState(0);
 
@@ -37,7 +40,7 @@ const ResultDetailModal: React.FC<ResultDetailModalProps> = ({
         evaluation_status: "피드백 완료",
       });
       alert("피드백이 성공적으로 저장되었습니다.");
-      window.location.reload();
+      navigate(location.pathname);
       onClose();
     } catch (error) {
       console.error("Failed to save feedback:", error);
